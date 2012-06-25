@@ -29,6 +29,10 @@
 
 note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox
 
+== config ==
+
+* config.sh for per-developer (workspace) settings, tests/default.sh sets up all the rest dynamically based on the currently running test
+
 == tests ==
 
 * tests/default.sh get sourced before every real test, it defines default behavior and demonstrates config options
@@ -52,6 +56,7 @@ clone this project (potentially as submodule within the project you want to test
 to customize the main app, libraries, inputs or probes, this app won't do stuff like looking into "default" and "user" dirs, preferring files with the same name in the latter dir over the former, and expecting you to only modify certain files.
 stuff like that is often a maintenance pain.  instead, just modify the project itself wherever seems the best place to you.  (in a branch named after and tailored towards testing the specific app).
 If appropriate, try to get your changes merged upstream.
+Consider putting config.sh in .gitignore to ignore some per-developer specific settings like $src
 
 == dependencies ==
 

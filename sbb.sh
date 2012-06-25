@@ -46,6 +46,7 @@ while getopts "hdpv" OPTION; do
 done
 
 ### RUN ###
+source config.sh
 
 # run all tests that can run on their own
 for t in tests/!(generic_*); do
