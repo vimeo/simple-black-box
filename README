@@ -23,6 +23,7 @@
 * assert (non-)occurence of patterns in log files, stdout and sterr streams (errors, warnings, etc)
 * trace http traffic matching certain conditions, allowing you to inspect all headers (very useful for http response codes)
 * check whether $num of processes are (still) running
+* check wether processes are listening on specified sockets
 * assert exit code of commands, useful for arbitrary commands/scripts
 * check checksums of files on the filesystem or blobs in a swift cluster
 
