@@ -31,10 +31,13 @@ EOF
     exit ${1:-0}
 }
 
-while getopts "hdpv" OPTION; do
+while getopts "hdpvc:" OPTION; do
      case $OPTION in
          h)
              usage
+             ;;
+         c)
+             config="$OPTARG"
              ;;
          d)
              debug=1
@@ -52,7 +55,8 @@ while getopts "hdpv" OPTION; do
 done
 
 ### RUN ###
-source config.sh
+[ -r "$config" ] || die_error "must have a config file (with -c <config>), not '$config'"
+source "$config" || die_error "failed to source config $config"
 [ -n "$project" ] || die_error "\$project must be set to the name of your project"
 [ -d "$src" ] || die_error "\$src must be set to a directory containing your project, not '$src'"
 

@@ -31,7 +31,8 @@ note: they get all variables as arguments to functions, no global vars, with the
 
 == config ==
 
-* config.sh for per-developer (workspace) settings, tests/default.sh sets up all the rest dynamically based on the currently running test
+* use -c <config_file> for per-developer (workspace) settings, tests/default.sh sets up all the rest dynamically based on the currently running test
+  see config-example.sh.
 
 == tests ==
 
