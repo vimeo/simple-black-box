@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /usr/lib/libui.sh
+source /usr/lib/libui-colors.sh
 for f in lib/*.sh inputs/*.sh probes/*.sh; do
         source $f
 done

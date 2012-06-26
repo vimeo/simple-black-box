@@ -64,6 +64,7 @@ Consider putting config.sh in .gitignore to ignore some per-developer specific s
 * sed
 * grep
 * procps-ng
+* libui-sh (https://github.com/Dieterbe/libui-sh -- this is just 2 files that go in /usr/lib)
 
 == optional dependencies ==
 

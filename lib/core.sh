@@ -19,7 +19,7 @@ win () {
 debug () {
         local message=$1
         if((debug)); then
-                echo -e "${Grey}debug: $message$Color_Off"
+                echo -e "${BBlack}debug: $message$Color_Off"
         fi
 }
 
@@ -42,7 +42,7 @@ run_test () {
         source tests/$test.sh
         test_setvars "$@"
         echo -e "${BBlue}Running test $test $@$Color_Off"
-        echo -e "${Grey}sandbox is $sandbox$Color_Off"
+        echo -e "${BBlack}sandbox is $sandbox$Color_Off"
         test_prepare_sandbox "$@"
         test_pre "$@"
         test_run "$@"
