@@ -53,6 +53,8 @@ done
 
 ### RUN ###
 source config.sh
+[ -n "$project" ] || die_error "\$project must be set to the name of your project"
+[ -d "$src" ] || die_error "\$src must be set to a directory containing your project, not '$src'"
 
 # run all tests that can run on their own
 for t in tests/!(generic_*); do
