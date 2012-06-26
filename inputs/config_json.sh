@@ -43,7 +43,7 @@ json_get_var_string () {
         local key=$2
         [ -n "$file" -a -f "$file" ] || die_error "json_get_var_string \$1 must be the config file, not '$1'"
         [ -n "$key" ] || die_error "json_get_var_string \$2 must be a non-zero config key, not '$2'"
-        grep "^\"$key\":" "$file" | sed 's/.*"\([^"]*\)",\?$/\1/'
+        return=$(grep "^\"$key\":" "$file" | sed 's/.*"\([^"]*\)",\?$/\1/')
 }
 
 # $1 config file
@@ -54,5 +54,5 @@ json_get_var_number () {
         local key=$2
         [ -n "$file" -a -f "$file" ] || die_error "json_get_var_string \$1 must be the config file, not '$1'"
         [ -n "$key" ] || die_error "json_get_var_string \$2 must be a non-zero config key, not '$2'"
-        grep "^\"$key\":" "$file" | cut -d' ' -f2 | sed 's/,$//'
+        return=$(grep "^\"$key\":" "$file" | cut -d' ' -f2 | sed 's/,$//')
 }

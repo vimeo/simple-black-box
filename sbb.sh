@@ -7,6 +7,10 @@ for f in lib/*.sh inputs/*.sh probes/*.sh; do
 done
 shopt -s extglob
 
+# you can use this variable to communicate from functions to the main scope,
+# without putting the function in a subshell, so that it can exit the process
+# in error conditions (die_error)
+return=
 debug=0
 verbose=0
 pause=0
