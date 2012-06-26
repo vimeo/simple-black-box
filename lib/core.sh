@@ -1,7 +1,9 @@
+# for internal (to the framework) assertions, set variable internal=1
 # $1 message
 fail () {
         local message=$1
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
+        ((internal)) && die_error "internal assertion failed: $1"
         echo -e "${Red}[FAIL]${Color_Off}: $message"
         if((pause)); then
                 debug_all_errors
@@ -14,7 +16,7 @@ fail () {
 win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
-        echo -e "${Green}[WIN!]${Color_Off}: $message"
+        ((!internal)) && echo -e "${Green}[WIN!]${Color_Off}: $message"
 }
 
 # $1 message
