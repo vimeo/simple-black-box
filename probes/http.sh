@@ -1,6 +1,7 @@
 # $1 http pattern, to be fed to ngrep. something like 'port 80 and host foo'
 set_http_probe () {
         local http_pattern="$1" # to be fed to ngrep.  something like 'port 80 and host foo'
+        [ -n "$http_pattern" ] || die_error "set_http_probe () needs a non-zero ngrep pattern to match http traffic"
         debug "set_http_probe '$http_pattern'"
         sudo ngrep -W byline $http_pattern > $sandbox/sbb-http &
 }
@@ -8,6 +9,7 @@ set_http_probe () {
 # $1 accepted_codes: egrep-compatible expression of http status codes, example: '(200|201)'
 assert_all_responses () {
         local accepted_codes="$1" # egrep-compatible expression of http status codes, example: '(200|201)'
+        [ -n "$accepted_codes" ] || die_error "assert_all_responses () needs a non-zero egrep regex to match http codes"
         local num_match=$(egrep -c "^HTTP/1\.. $accepted_codes" $sandbox/sbb-http)
         num_all=$(egrep -c "^HTTP/1\.. " $sandbox/sbb-http)
         if [ $num_match -ne $num_all ]; then
@@ -21,6 +23,7 @@ assert_all_responses () {
 # $1 http pattern (as specified to set_http_probe)
 remove_http_probe () {
         local http_pattern="$1"
+        [ -n "$http_pattern" ] || die_error "remote_http_probe () needs a non-zero ngrep pattern that was used to match http traffic"
         debug "remove_http_probe '$http_pattern'"
         #FIXME https://sourceforge.net/tracker/?func=detail&aid=3537747&group_id=10752&atid=110752
         # should not require root here.

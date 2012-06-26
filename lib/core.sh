@@ -1,6 +1,7 @@
 # $1 message
 fail () {
         local message=$1
+        [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         echo -e "${Red}[FAIL]${Color_Off}: $message"
         if((pause)); then
                 debug_all_errors
@@ -12,12 +13,14 @@ fail () {
 # $1 message
 win () {
         local message=$1
+        [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
         echo -e "${Green}[WIN!]${Color_Off}: $message"
 }
 
 # $1 message
 debug () {
         local message=$1
+        [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
                 echo -e "${BBlack}debug: $message$Color_Off"
         fi
@@ -27,6 +30,7 @@ debug () {
 # stdin: all lines to go into debug output
 debug_stream () {
         local message=$1
+        [ -n "$1" ] || die_error "debug_stream() \$1 must be a non-zero message"
         debug "$message"
         while read line; do
                 debug "$line"
@@ -37,6 +41,8 @@ debug_stream () {
 # $2..n extra args to be passed to individual functions
 run_test () {
         local test=$1
+        [ -n "$1" -a -f "tests/$test.sh" ] || die_error "run_test() \$1 must be the name of an existing testcase, not '$1'"
+        [[ "$test" =~ [\ ] ]] && die_error "testcase may not have whitespace in the name (no specific reason, just makes everybodies life a bit easier)."
         shift
         source tests/default.sh
         source tests/$test.sh
@@ -57,6 +63,8 @@ run_test () {
 kill_graceful () {
         local regex="$1"
         local timeout=$2
+        [ -n "$1" ] || die_error "kill_graceful() \$1 must be a non-zero regex"
+        [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$2 must be a number! not $2"
         debug "kill_graceful '$regex' $timeout"
         pkill -f "$regex" 2>/dev/null
         timer=0
