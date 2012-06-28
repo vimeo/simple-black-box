@@ -4,7 +4,7 @@
 
 # callback, triggered at least from inside the main app
 debug_all_errors () {
-        grep -Ri --color=never error $stdout $stderr 2>/dev/null | debug_stream "all errors:"
+        grep -Ri --color=never error $stdout $stderr $log 2>/dev/null | debug_stream "all errors:"
 }
 
 test_setvars () {
@@ -14,6 +14,7 @@ test_setvars () {
         sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
         stdout=$sandbox/stdout
         stderr=$sandbox/stderr
+        log= # optional
         config_backend=json
         config_sandbox=$sandbox/node_modules/vegaconf.json
         config_src=$src/node_modules/vegaconf.json
@@ -65,6 +66,6 @@ test_teardown () {
 }
 
 test_post () {
-        assert_no_errors
+        assert_no_errors $stdout $stderr $log
         debug_all_errors
 }

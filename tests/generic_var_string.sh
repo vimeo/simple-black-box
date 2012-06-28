@@ -16,8 +16,8 @@ test_while () {
 
 test_post () {
         if [ -z "$error" ]; then
-                assert_no_errors;
+                assert_no_errors $stdout $stderr $log
         else
-                assert_only_error "$error"
+                assert_only_error "$error" $stdout $stderr $log
         fi
 }
