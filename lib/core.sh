@@ -46,7 +46,6 @@ run_test () {
         [[ "$test" =~ [\ ] ]] && die_error "testcase may not have whitespace in the name (no specific reason, just makes everybodies life a bit easier)."
         source tests/default.sh
         source tests/$test.sh
-        test_setvars
         echo -e "${BBlue}Running test $test$Color_Off"
         echo -e "${BBlack}sandbox is $sandbox$Color_Off"
         test_prepare_sandbox
