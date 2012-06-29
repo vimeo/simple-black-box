@@ -40,23 +40,21 @@ debug_stream () {
 }
 
 # $1 test case
-# $2..n extra args to be passed to individual functions
 run_test () {
         local test=$1
         [ -n "$1" -a -f "tests/$test.sh" ] || die_error "run_test() \$1 must be the name of an existing testcase, not '$1'"
         [[ "$test" =~ [\ ] ]] && die_error "testcase may not have whitespace in the name (no specific reason, just makes everybodies life a bit easier)."
-        shift
         source tests/default.sh
         source tests/$test.sh
-        test_setvars "$@"
-        echo -e "${BBlue}Running test $test $@$Color_Off"
+        test_setvars
+        echo -e "${BBlue}Running test $test$Color_Off"
         echo -e "${BBlack}sandbox is $sandbox$Color_Off"
-        test_prepare_sandbox "$@"
-        test_pre "$@"
-        test_run "$@"
-        test_while "$@"
-        test_teardown "$@"
-        test_post "$@"
+        test_prepare_sandbox
+        test_pre
+        test_run
+        test_while
+        test_teardown
+        test_post
         echo
 }
 

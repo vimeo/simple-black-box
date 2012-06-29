@@ -9,8 +9,7 @@ debug_all_errors () {
 
 test_setvars () {
         # test identifier, sandbox, config and i/o locations
-        test_id="$(cd "$src" && git describe --always --dirty)_test_${test}_$@"
-        test_id=$(echo "$test_id" | sed 's/_$//')
+        test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
         sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
         stdout=$sandbox/stdout
         stderr=$sandbox/stderr
