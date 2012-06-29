@@ -7,29 +7,28 @@ debug_all_errors () {
         grep -Ri --color=never error $stdout $stderr $log 2>/dev/null | debug_stream "all errors:"
 }
 
-test_setvars () {
-        # test identifier, sandbox, config and i/o locations
-        test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
-        sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
-        stdout=$sandbox/stdout
-        stderr=$sandbox/stderr
-        log= # optional
-        config_backend=json
-        config_sandbox=$sandbox/node_modules/vegaconf.json
-        config_src=$src/node_modules/vegaconf.json
+# needed vars: $src, $test, $project
+# test identifier, sandbox, config and i/o locations
+test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
+sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
+stdout=$sandbox/stdout
+stderr=$sandbox/stderr
+log= # optional
+config_backend=json
+config_sandbox=$sandbox/node_modules/vegaconf.json
+config_src=$src/node_modules/vegaconf.json
 
-        # probe / assertion parameters
-        num_procs_up=3
-        num_procs_down=0
-        listen_address=tcp:8080
-        # node cluster doesn't kill children properly yet https://github.com/joyent/node/pull/2908
-        # so until then, match both master and workers
-        # 'pgrep -f' compatible regex to capture all our "subject processes"
-        subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
-        http_pattern="port 80 and host localhost"
-        # command to start the program from inside the sandbox (ignoring stdout/stderr here)
-        process_launch="coffee $project.coffee"
-}
+# probe / assertion parameters
+num_procs_up=3
+num_procs_down=0
+listen_address=tcp:8080
+# node cluster doesn't kill children properly yet https://github.com/joyent/node/pull/2908
+# so until then, match both master and workers
+# 'pgrep -f' compatible regex to capture all our "subject processes"
+subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
+http_pattern="port 80 and host localhost"
+# command to start the program from inside the sandbox (ignoring stdout/stderr here)
+process_launch="coffee $project.coffee"
 
 test_prepare_sandbox () {
         mkdir -p $sandbox
