@@ -59,10 +59,10 @@ run_test () {
 }
 
 # $1 'pgrep -f'-compatible regex (be very careful about specifying and passing this correctly!)
-# $2 deciseconds to wait for processes to exit after receiving TERM before issuing KILL
+# $2 deciseconds to wait for processes to exit after receiving TERM before issuing KILL (default 50)
 kill_graceful () {
         local regex="$1"
-        local timeout=$2
+        local timeout=${2:-50}
         [ -n "$1" ] || die_error "kill_graceful() \$1 must be a non-zero regex"
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$2 must be a number! not $2"
         debug "kill_graceful '$regex' $timeout"

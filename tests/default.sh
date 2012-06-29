@@ -56,7 +56,7 @@ test_while () {
 }
 
 test_teardown () {
-        kill_graceful "$subject_process" 50
+        kill_graceful "$subject_process"
         assert_num_procs "$subject_process" $num_procs_down
         remove_http_probe "$http_pattern"
         assert_listening "$listen_address" 0
