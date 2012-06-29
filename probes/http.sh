@@ -4,6 +4,7 @@ set_http_probe () {
         [ -n "$http_pattern" ] || die_error "set_http_probe () needs a non-zero ngrep pattern to match http traffic"
         debug "set_http_probe '$http_pattern'"
         sudo ngrep -W byline $http_pattern > $sandbox/sbb-http &
+        internal=1 assert_num_procs "^ngrep.*$http_pattern" 1
 }
 
 # $1 accepted_codes: egrep-compatible expression of http status codes, example: '(200|201)'
@@ -28,4 +29,5 @@ remove_http_probe () {
         #FIXME https://sourceforge.net/tracker/?func=detail&aid=3537747&group_id=10752&atid=110752
         # should not require root here.
         sudo pkill -f "^ngrep -W byline $http_pattern"
+        internal=1 assert_num_procs "^ngrep.*$http_pattern" 0
 }

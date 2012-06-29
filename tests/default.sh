@@ -36,7 +36,6 @@ test_prepare_sandbox () {
         rsync -au --delete $src/ $sandbox/
         assert_exitcode test -f $sandbox/$project.coffee
         set_http_probe "$http_pattern"
-        internal=1 assert_num_procs "^ngrep.*$http_pattern" 1
 }
 
 test_pre () {
@@ -60,7 +59,6 @@ test_teardown () {
         kill_graceful "$subject_process" 50
         assert_num_procs "$subject_process" $num_procs_down
         remove_http_probe "$http_pattern"
-        internal=1 assert_num_procs "^ngrep.*$http_pattern" 0
         assert_listening "$listen_address" 0
 }
 
