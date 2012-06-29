@@ -15,8 +15,8 @@ stdout=$sandbox/stdout
 stderr=$sandbox/stderr
 log= # optional
 config_backend=json
-config_sandbox=$sandbox/node_modules/vegaconf.json
-config_src=$src/node_modules/vegaconf.json
+config_sandbox=$sandbox/node_modules/${project}conf.json
+config_src=$src/node_modules/${project}conf.json
 
 # probe / assertion parameters
 num_procs_up=3
