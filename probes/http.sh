@@ -1,3 +1,6 @@
+regex_client_socket='[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}:[[:digit:]]+' #'<ip address>:<port>'
+regex_socket_info="^T $regex_client_socket -> $regex_client_socket( |$)"
+
 # $1 http pattern, to be fed to ngrep. something like 'port 80 and host foo'
 set_http_probe () {
         local http_pattern="$1" # to be fed to ngrep.  something like 'port 80 and host foo'
@@ -19,6 +22,90 @@ assert_all_responses () {
         else
                 win "all $num_match http response codes were $accepted_codes"
         fi
+}
+
+# $1 regex to match request
+# $2 min expected number of matching requests (0-...)
+# $3 max expected number of matching requests (0-I where I means Infinity, i.e. disable this check)
+assert_num_http_requests () {
+        local match_req="$1"
+        local match_req_min=$2
+        local match_req_max=$3
+        [ -n "$match_req" ] || die_error "assert_num_http_requests () needs a non-zero egrep regex to match the http request"
+        [[ $match_req_min =~ ^[0-9]+$ ]] || die_error "assert_num_http_requests() \$2 must be a number! not $2"
+        [[ $match_req_max =~ ^[0-9]+$ ]] || [ "$match_req_max" == "I" ] || die_error "assert_num_http_requests() \$3 must be a number or I(nfinity)! not $3"
+        [ $match_req_max != "I" ] && [ $match_req_max -ge $match_req_min ] || die_error "assert_num_http_requests() match_req_min ($match_req_min) must be lower or equal to match_req_max ($match_req_max)"
+        # in the ngrep output, you always first see the socket info and on the line below, either a http request or response
+        requests=$(egrep -A 1 "$regex_socket_info" $sandbox/sbb-http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep -c "$match_req")
+        egrep -A 1 "$regex_socket_info" $sandbox/sbb-http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep "$match_req" | debug_stream "http requests matching $match_req"
+        if [ $requests -ge $match_req_min ]; then
+                if [ "$match_req_max" == "I" ] || [ $requests -le $match_req_max ]; then
+                        win "found $requests matching $match_req, which is between $match_req_min (min) and $match_req_max (max)"
+                        return
+                fi
+        fi
+        fail "found $requests matching $match_req which is not between $match_req_min (min) and $match_req_max (max)"
+}
+
+# $1 regex to match request
+# $2 regex to match response
+# assert that all responses to any requests matching $match_req match $match_res
+# note that you can sometimes see several http requests (matching and/or not matching) before seeing their responses.
+# so for every matching request, we track the client socket, and then, the first time we see a particular client socket we were
+# looking for, we can safely assume it's the corresponding response, so we process it and then stop looking for that client socket.
+assert_http_response_to () {
+        local match_req="$1"
+        local match_res="$2"
+        [ -n "$match_req" ] || die_error "assert_http_response_to () needs a non-zero egrep regex to match the http request"
+        [ -n "$match_res" ] || die_error "assert_http_response_to () needs a non-zero egrep regex to match the http response"
+        responses_good=()
+        responses_bad=()
+        # internal check to be sure we find 1 response for each found request
+        requests_found=0
+        responses_found=0
+        client_sockets=() # list of 'client ip:port' used to do matching requests, this allows us to find the responses
+        while read line; do
+                if egrep -q "$regex_socket_info" <<< "$line"; then
+                        socket_info=$line
+                        read line
+                        if ! grep -q "^HTTP" <<< $line; then
+                                # $line is a request
+                                if egrep -q "$match_req" <<< "$line"; then
+                                        client_sockets+=($(awk "/$regex_socket_info/ {print \$2}" <<< "$socket_info"))
+                                        requests_found=$((requests_found+1))
+                                fi
+                        else
+                                # $line is a response
+                                if [ ${#client_sockets[@]} -gt 0 ]; then
+                                        client_sockets_still_notfound=()
+                                        for client_socket in ${client_sockets[@]}; do
+                                                if egrep -q "T $regex_client_socket -> $client_socket( |$)" <<< "$socket_info"; then
+                                                        responses_found=$((responses_found+1))
+                                                        egrep -q "$match_res" <<< $line && responses_good+=("$line") || responses_bad+=("$line")
+                                                else
+                                                        client_sockets_still_notfound+=($client_socket)
+                                                fi
+                                        done
+                                        client_sockets=(${client_sockets_still_notfound[@]})
+                                fi
+                        fi
+                fi
+        done < $sandbox/sbb-http
+        internal=1 assert_http_req_resp_found $requests_found $responses_found
+        if [ ${#responses_bad[@]} -eq 0 ]; then
+                win "all $requests_found found requests matching $match_req have a response matching $match_res"
+        else
+                fail "$requests_found found requests matching $match_req yielded ${#responses_good[@]} responses matching $match_res, and ${#responses_bad[@]} that do not match (${responses_bad[@]})"
+        fi
+        debug "responses_good: ${responses_good[@]}"
+        debug "responses_bad: ${responses_bad[@]}"
+}
+
+# $1 requests_found
+# $2 responses_found
+# for internal use
+assert_http_req_resp_found () {
+        [ $1 -ne $2 ] && fail "internal error. found $1 http requests but $2 responses. this number should match"
 }
 
 # $1 http pattern (as specified to set_http_probe)
