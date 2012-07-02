@@ -34,14 +34,15 @@ test_prepare_sandbox () {
         mkdir -p $sandbox
         rsync -au --delete $src/ $sandbox/
         assert_exitcode test -f $sandbox/$project.coffee
-        set_http_probe "$http_pattern"
 }
 
+# here you can alter the sandbox, modify config settings etc.
 test_pre () {
         true
 }
 
 test_run () {
+        set_http_probe "$http_pattern"
         cd $sandbox
         $process_launch > $stdout 2> $stderr &
         # allow processes to actually start and do all their config, bootstrapping, etc
@@ -49,6 +50,7 @@ test_run () {
         cd - >/dev/null
 }
 
+# do assertions which are executed while the subject process should be up and running
 test_while () {
         assert_num_procs "$subject_process" $num_procs_up
         assert_listening "$listen_address" 1
@@ -61,6 +63,7 @@ test_teardown () {
         assert_listening "$listen_address" 0
 }
 
+# perform operations which you don't want to be catched by the http probe and/or which are better suited when the subject process is down
 test_post () {
         assert_no_errors $stdout $stderr $log
         debug_all_errors
