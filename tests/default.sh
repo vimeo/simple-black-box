@@ -80,6 +80,8 @@ test_teardown () {
 
 # perform operations which you don't want to be catched by the http probe and/or which are better suited when the subject process is down
 test_post () {
+        assert_http_response_to 'GET /auth/v1.0' 200
+        assert_num_http_requests 'GET /auth/v1.0' $num_procs_up $num_procs_up # every process will do an auth
         assert_no_errors $stdout $stderr $log
         debug_all_errors
 }
