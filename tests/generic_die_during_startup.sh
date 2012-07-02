@@ -11,6 +11,8 @@ test_while () {
 }
 
 test_post () {
-       assert_only_error "$error" $stdout $stderr $log
-       debug_all_errors
+        assert_num_http_requests 'GET /auth/v1.0' 0 0
+        assert_num_http_requests '.*' 0 0
+        assert_only_error "$error" $stdout $stderr $log
+        debug_all_errors
 }

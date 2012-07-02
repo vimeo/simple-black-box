@@ -17,8 +17,11 @@ test_while () {
 
 test_post () {
         if [ -z "$error" ]; then
+                assert_http_response_to 'GET /auth/v1.0' 200
+                assert_num_http_requests 'GET /auth/v1.0' $num_procs_up $num_procs_up # every process will do an auth
                 assert_no_errors $stdout $stderr $log
         else
+                assert_num_http_requests '.*' 0 0
                 assert_only_error "$error" $stdout $stderr $log
         fi
         debug_all_errors
