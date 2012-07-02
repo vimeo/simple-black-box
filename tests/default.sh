@@ -34,7 +34,7 @@ listen_address=tcp:8080
 # so until then, match both master and workers
 # 'pgrep -f' compatible regex to capture all our "subject processes"
 subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
-http_pattern="port $swift_port and host $swift_host"
+http_pattern="-d tun0 port $swift_port and host $swift_host"
 # command to start the program from inside the sandbox (ignoring stdout/stderr here)
 process_launch="coffee $project.coffee"
 
