@@ -11,7 +11,7 @@ set_http_probe () {
 }
 
 # $1 accepted_codes: egrep-compatible expression of http status codes, example: '(200|201)'
-assert_all_responses () {
+assert_all_http_responses () {
         local accepted_codes="$1" # egrep-compatible expression of http status codes, example: '(200|201)'
         [ -n "$accepted_codes" ] || die_error "assert_all_responses () needs a non-zero egrep regex to match http codes"
         local num_match=$(egrep -c "^HTTP/1\.. $accepted_codes" $sandbox/sbb-http)
