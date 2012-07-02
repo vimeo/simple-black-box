@@ -72,3 +72,4 @@ else
                 run_test $(basename $t .sh)
         done
 fi
+show_summary

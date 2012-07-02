@@ -3,15 +3,26 @@
 
 # $1 swift_args
 # $2 container
+# $3 1 for existing, 0 for not existing (default: 1)
 assert_container_exists () {
         local swift_args="$1"
         local container=$2
+        local existing=${3:-1}
         [ -n "$swift_args" ] || die_error "assert_container_exists() needs a list of swift args as \$1"
         [ -n "$container" ] || die_error "assert_container_exists() needs a non-zero swift container name as \$2"
-        if swift $swift_args list "$container" 2>&1 | grep -vq "Container '$container' not found"; then
-                win "swift container $container exists"
+        check_is_in $existing 0 1 || die_error "assert_container_exists() needs the number 1 or 0 (or empty for default of 1) as \$3, not $3"
+        if swift $swift_args list "$container" 2>&1 | grep -q "Container '$container' not found"; then
+                if ((existing)); then
+                        fail "swift container '$container' not found"
+                else
+                        win "swift container '$container' not found"
+                fi
         else
-                fail "swift container $container not found"
+                if ((existing)); then
+                        win "swift container '$container' exists"
+                else
+                        fail "swift container '$container' exists"
+                fi
         fi
 }
 
