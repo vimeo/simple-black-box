@@ -6,4 +6,5 @@ test_pre () {
 
 test_post () {
         swift $swift_args delete $random_container
+        debug_all_errors
 }

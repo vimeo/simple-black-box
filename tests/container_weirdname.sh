@@ -5,4 +5,5 @@ test_pre () {
 }
 test_post () {
         swift $swift_args delete "$fu_string"
+        debug_all_errors
 }

@@ -12,4 +12,5 @@ test_while () {
 
 test_post () {
        assert_only_error "$error" $stdout $stderr $log
+       debug_all_errors
 }
