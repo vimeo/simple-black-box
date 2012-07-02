@@ -45,8 +45,10 @@ test_run () {
         set_http_probe "$http_pattern"
         cd $sandbox
         $process_launch > $stdout 2> $stderr &
-        # allow processes to actually start and do all their config, bootstrapping, etc
-        sleep 3s
+        # even though those assert functions who need it have timeouts,
+        # we should be sure that the process doesn't start and dies quickly after.
+        # this sleep makes sure the env is "stable"
+        sleep 5s
         cd - >/dev/null
 }
 
