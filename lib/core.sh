@@ -1,3 +1,7 @@
+wins=0
+fails=0
+testcases=0
+
 # for internal (to the framework) assertions, set variable internal=1
 # $1 message
 fail () {
@@ -5,6 +9,7 @@ fail () {
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         ((internal)) && die_error "internal assertion failed: $1"
         echo -e "${Red}[FAIL]${Color_Off}: $message"
+        fails=$((fails+1))
         if((pause)); then
                 debug_all_errors
                 echo "Pausing as requested.  Go fix it cowboy! Hit any key to continue (pro-tip: ctrl-Z to background and fg to resume again)"
@@ -17,6 +22,7 @@ win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
         ((!internal)) && echo -e "${Green}[WIN!]${Color_Off}: $message"
+        wins=$((wins+1))
 }
 
 # $1 message
@@ -54,6 +60,7 @@ run_test () {
         test_while
         test_teardown
         test_post
+        testcases=$((testcases+1))
         echo
 }
 
@@ -72,4 +79,10 @@ kill_graceful () {
                 timer=$((timer+1))
         done
         pkill -9 -f "$regex" 2>/dev/null
+}
+
+show_summary () {
+        color=${Green}
+        [ $fails -gt 0 ] && color=${Red}
+        echo -e "${color}SUMMARY: $wins WIN, $fails FAIL in $testcases testcases${Color_Off}"
 }
