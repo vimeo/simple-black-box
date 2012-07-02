@@ -12,6 +12,7 @@ test_pre () {
 
 test_while () {
         assert_num_procs "$subject_process" $num_procs
+        assert_listening "$listen_address" $listening
 }
 
 test_post () {
