@@ -8,10 +8,11 @@ assert_container_exists () {
         local container=$2
         [ -n "$swift_args" ] || die_error "assert_container_exists() needs a list of swift args as \$1"
         [ -n "$container" ] || die_error "assert_container_exists() needs a non-zero swift container name as \$2"
-        if swift $swift_args list "$container" 2>&1 | grep -vq "Container '$container' not found"; then
-                win "swift container $container exists"
+        # the echo is needed because grep -v needs always some input before the exitcodes are "normal"
+        if { echo && swift $swift_args list "$container"; } 2>&1 | grep -vq "Container '$container' not found"; then
+                win "swift container '$container' exists"
         else
-                fail "swift container $container not found"
+                fail "swift container '$container' not found"
         fi
 }
 
