@@ -40,7 +40,7 @@ assert_num_http_requests () {
         egrep -A 1 "$regex_socket_info" $sandbox/sbb-http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep "$match_req" | debug_stream "http requests matching $match_req"
         if [ $requests -ge $match_req_min ]; then
                 if [ "$match_req_max" == "I" ] || [ $requests -le $match_req_max ]; then
-                        win "found $requests matching $match_req, which is between $match_req_min (min) and $match_req_max (max)"
+                        win "found $requests requests matching $match_req, which is between $match_req_min (min) and $match_req_max (max)"
                         return
                 fi
         fi
@@ -91,14 +91,14 @@ assert_http_response_to () {
                         fi
                 fi
         done < $sandbox/sbb-http
+        debug "responses_good: ${responses_good[@]}"
+        debug "responses_bad: ${responses_bad[@]}"
         internal=1 assert_http_req_resp_found $requests_found $responses_found
         if [ ${#responses_bad[@]} -eq 0 ]; then
                 win "all $requests_found found requests matching $match_req have a response matching $match_res"
         else
                 fail "$requests_found found requests matching $match_req yielded ${#responses_good[@]} responses matching $match_res, and ${#responses_bad[@]} that do not match (${responses_bad[@]})"
         fi
-        debug "responses_good: ${responses_good[@]}"
-        debug "responses_bad: ${responses_bad[@]}"
 }
 
 # $1 requests_found
