@@ -38,9 +38,6 @@ http_pattern="-d tun0 port $swift_port and host $swift_host"
 # command to start the program from inside the sandbox (ignoring stdout/stderr here)
 process_launch="coffee $project.coffee"
 
-#fu_string='!@$%^&*(){}+?_|z/=\-][0' # this can get a whole lot nastier.. with ~,',"and #, but for this early prototype, will do
-fu_string='@^%0eau'
-
 test_prepare_sandbox () {
         mkdir -p $sandbox
         rsync -au --delete $src/ $sandbox/
