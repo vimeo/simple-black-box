@@ -20,4 +20,5 @@ test_post () {
         else
                 assert_only_error "$error" $stdout $stderr $log
         fi
+        debug_all_errors
 }
