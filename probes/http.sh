@@ -105,6 +105,8 @@ assert_http_response_to () {
 # $2 number of corresponding responses
 # for internal use
 assert_http_req_resp_found () {
+        [[ $1 =~ ^[0-9]+$ ]] || die_error "assert_http_req_resp_found(): \$1 must be a number to denote number of requests, not '$1'"
+        [[ $2 =~ ^[0-9]+$ ]] || die_error "assert_http_req_resp_found(): \$2 must be a number to denote number of responses, not '$2'"
         [ $1 -ne $2 ] && fail "internal error. found $1 http request(s) but $2 response(s). this number should match"
 }
 
