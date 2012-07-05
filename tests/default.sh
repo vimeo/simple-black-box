@@ -38,7 +38,7 @@ http_pattern="-d tun0 port $swift_port and host $swift_host"
 # command to start the program from inside the sandbox (ignoring stdout/stderr here)
 process_launch="coffee $project.coffee"
 
-test_prepare_sandbox () {
+test_init () {
         mkdir -p $sandbox
         rsync -au --delete $src/ $sandbox/
         assert_exitcode test -f $sandbox/$project.coffee
@@ -51,7 +51,7 @@ test_pre () {
         true
 }
 
-test_run () {
+test_start () {
         set_http_probe "$http_pattern"
         cd $sandbox
         $process_launch > $stdout 2> $stderr &
@@ -68,7 +68,7 @@ test_while () {
         assert_listening "$listen_address" 1
 }
 
-test_teardown () {
+test_stop () {
         kill_graceful "$subject_process"
         assert_num_procs "$subject_process" $num_procs_down
         remove_http_probe "$http_pattern"

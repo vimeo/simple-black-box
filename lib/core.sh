@@ -2,12 +2,18 @@ wins=0
 fails=0
 testcases=0
 
+# looks for global var $sbb_section
+print_section () {
+        printf "%5s " $sbb_section
+}
+
 # for internal (to the framework) assertions, set variable internal=1
 # $1 message
 fail () {
         local message=$1
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         ((internal)) && die_error "internal assertion failed: $1"
+        print_section
         echo -e "${Red}[FAIL]${Color_Off}: $message"
         fails=$((fails+1))
         if((pause)); then
@@ -21,7 +27,7 @@ fail () {
 win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
-        ((!internal)) && echo -e "${Green}[WIN!]${Color_Off}: $message"
+        ((!internal)) && print_section && echo -e "${Green}[WIN!]${Color_Off}: $message"
         wins=$((wins+1))
 }
 
@@ -30,7 +36,8 @@ debug () {
         local message=$1
         [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
-                echo -e "${BBlack}debug: $message$Color_Off"
+                print_section
+                echo -e "${BBlack}[debug] $message$Color_Off"
         fi
 }
 
@@ -54,12 +61,11 @@ run_test () {
         source tests/$test.sh
         echo -e "${BBlue}Running test $test$Color_Off"
         echo -e "${BBlack}sandbox is $sandbox$Color_Off"
-        test_prepare_sandbox
-        test_pre
-        test_run
-        test_while
-        test_teardown
-        test_post
+        for section in init pre start while stop post; do
+                sbb_section=$section
+                test_$section
+        done
+        sbb_section=
         testcases=$((testcases+1))
         echo
 }
@@ -79,6 +85,20 @@ kill_graceful () {
                 timer=$((timer+1))
         done
         pkill -9 -f "$regex" 2>/dev/null
+}
+
+# $1 the "what", for example 'somefunction() shift; $@' to denote all params after the first one in somefunction()
+# shift; $@ list of params of which at least one must be a readable file
+at_least_one_readable_file () {
+        local what="$1"
+        [ -n "$what" ] || die_error "atleast_onefile_readable() \$1 must be an identifier"
+        okay=0
+        shift
+        for f in $@; do
+                [ -n "$f" ] || die_error "atleast_onefile_readable(): $what: all files listed must be non-zero strings"
+                [ -f "$f" -a -r "$f" ] && okay=1
+        done
+        ((okay)) || die_error "$what must at least contain one existing and readable file. not $*"
 }
 
 show_summary () {
