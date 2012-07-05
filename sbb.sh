@@ -67,8 +67,9 @@ source "$config" || die_error "failed to source config $config"
 if [ -n "$case" ]; then
         run_test $case
 else
-        # run all tests that can run on their own
-        for t in tests/!(generic_*).sh; do
+        # run all tests that can run on their own, starting with the default one
+        run_test default
+        for t in tests/!(generic_*|default).sh; do
                 run_test $(basename $t .sh)
         done
 fi
