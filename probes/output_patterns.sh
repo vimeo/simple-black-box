@@ -8,19 +8,19 @@ assert_no_errors () {
         fi
 }
 
-# $1 regex
+# $1 regex to match error
 # shift; $@ greppable things to look in
 assert_only_error () {
-        local regex=$1
+        local error_match=$1
         shift
-        num_errors=$(grep -iR "$regex" "$@" 2>/dev/null | wc -l)
-        if [ $num_errors -gt 0 ]; then
-                win "got $num_errors error(s) matching '$regex' in $*"
-                all_errors=$(grep -iR error "$@" 2>/dev/null | grep -iv "$regex" | wc -l)
-                if [ $all_errors -gt 0 ]; then
-                        fail "...but got $all_errors total errors in $*"
+        num_errors_match=$(grep -iR "$error_match" "$@" 2>/dev/null | wc -l)
+        if [ $num_errors_match -gt 0 ]; then
+                win "$num_errors_match error(s) matching '$error_match' in $*"
+                num_errors_all=$(grep -iR error "$@" 2>/dev/null | grep -iv "$error_match" | wc -l)
+                if [ $num_errors_all -gt 0 ]; then
+                        fail "$num_errors_all total errors in $*"
                 fi
         else
-                fail "didn't find any error matching '$regex' in $*"
+                fail "no error matching '$error_match' in $*"
         fi
 }

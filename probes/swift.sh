@@ -13,15 +13,15 @@ assert_container_exists () {
         check_is_in $existing 0 1 || die_error "assert_container_exists() needs the number 1 or 0 (or empty for default of 1) as \$3, not $3"
         if swift $swift_args list "$container" 2>&1 | grep -q "Container '$container' not found"; then
                 if ((existing)); then
-                        fail "swift container '$container' not found"
+                        fail "no swift container '$container'"
                 else
-                        win "swift container '$container' not found"
+                        win "no swift container '$container'"
                 fi
         else
                 if ((existing)); then
-                        win "swift container '$container' exists"
+                        win "1 swift container '$container'"
                 else
-                        fail "swift container '$container' exists"
+                        fail "1 swift container '$container'"
                 fi
         fi
 }
@@ -39,9 +39,9 @@ assert_object () {
         [ -n "$object" ] || die_error "assert_object() needs a non-zero swift object name as \$3"
         # not safe if $object contains chars with special meanings in regexes!
         if swift $swift_args list "$container" | grep -q "^$object$"; then
-                win "swift object $object exists in container $container"
+                win "1 swift object '$object' in container '$container'"
         else
-                fail "swift object $object not found in container $container"
+                fail "no swift object '$object' in container '$container'"
         fi
 }
 
@@ -61,8 +61,8 @@ assert_object_md5sum () {
         [ ${#md5sum} -eq 32 ] || die_error "assert_object_md5sum() \$4 must be an md5sum of 32 characters, not '$4'"
         local md5sum_swift=$(swift $swift_args download $container -o - $object | md5sum | cut -f1 -d' ')
         if [ $md5sum_swift = $md5sum ]; then
-                win "swift object $object in container $container has md5sum $md5sum"
+                win "swift object '$object' in container '$container' has md5sum $md5sum"
         else
-                fail "swift object $object in container $container has md5sum $md5sum_swift, not the expected $md5sum"
+                fail "swift object '$object' in container '$container' has md5sum $md5sum_swift, not the expected $md5sum"
         fi
 }
