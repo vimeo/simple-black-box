@@ -87,6 +87,20 @@ kill_graceful () {
         pkill -9 -f "$regex" 2>/dev/null
 }
 
+# $1 the "what", for example 'somefunction() shift; $@' to denote all params after the first one in somefunction()
+# shift; $@ list of params of which at least one must be a readable file
+at_least_one_readable_file () {
+        local what="$1"
+        [ -n "$what" ] || die_error "atleast_onefile_readable() \$1 must be an identifier"
+        okay=0
+        shift
+        for f in $@; do
+                [ -n "$f" ] || die_error "atleast_onefile_readable(): $what: all files listed must be non-zero strings"
+                [ -f "$f" -a -r "$f" ] && okay=1
+        done
+        ((okay)) || die_error "$what must at least contain one existing and readable file. not $*"
+}
+
 show_summary () {
         color=${Green}
         [ $fails -gt 0 ] && color=${Red}
