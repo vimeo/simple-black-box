@@ -10,7 +10,7 @@ debug_all_errors () {
 # needed vars: $src, $test, $project
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
-sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
+sandbox=/tmp/$project-$test_id # mirror of src which we can pollute with logfiles and modifications
 # filenames for log directory, stdout, stderr, http, ...
 # leave default unless it would conflict with existing files
 stdout=$sandbox/stdout
