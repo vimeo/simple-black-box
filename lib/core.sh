@@ -106,3 +106,27 @@ show_summary () {
         [ $fails -gt 0 ] && color=${Red}
         echo -e "${color}SUMMARY: $wins WIN, $fails FAIL in $testcases testcases${Color_Off}"
 }
+
+# assuming files like so: /tmp/blah/foo /tmp/blah/bar foobar, will condense to /tmp/blah/{foo,bar} foobar
+# but only when the path contains the sandbox. (this depends on $sandbox not having an ending /)
+# note this function does not care whether the files actually exist or not. it's just a display thing
+# $@ filenames
+compact_filenames () {
+        compact=()
+        normal=()
+        for f in $@; do
+               f_short=${f/$sandbox\/}
+               [ "$f_short" == "$f" ] && normal+=("$f") || compact+=("$f_short")
+        done
+        if [ ${#compact[@]} -eq 0 ]; then
+                echo ${normal[@]}
+        elif [ ${#compact[@]} -eq 1 ]; then
+                echo $sandbox/${compact[0]} ${normal[@]}
+        else
+                local str
+                for i in ${compact[@]}; do
+                        [ -n "$str" ] && str="$str,$i" || str=$i
+                done
+                echo "$sandbox/{$str} ${normal[@]}"
+       fi
+}

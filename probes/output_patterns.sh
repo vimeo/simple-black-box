@@ -3,9 +3,9 @@ assert_no_errors () {
         at_least_one_readable_file 'assert_no_errors() $@' $@
         num_errors=$(grep -iR error "$@" 2>/dev/null | wc -l)
         if [ $num_errors -eq 0 ]; then
-                win "no errors in $*!"
+                win "no errors in $(compact_filenames $@)!"
         else
-                fail "$num_errors errors in $*!"
+                fail "$num_errors errors in $(compact_filenames $@)!"
         fi
 }
 
@@ -18,13 +18,13 @@ assert_only_error () {
         at_least_one_readable_file 'assert_only_error() shift; $@' $@
         num_errors_match=$(grep -iR "$error_match" "$@" 2>/dev/null | wc -l)
         if [ $num_errors_match -gt 0 ]; then
-                win "$num_errors_match error(s) matching '$error_match' in $*"
+                win "$num_errors_match error(s) matching '$error_match' in $(compact_filenames $@)"
                 num_errors_all=$(grep -iR error "$@" 2>/dev/null | grep -iv "$error_match" | wc -l)
                 if [ $num_errors_all -gt 0 ]; then
-                        fail "$num_errors_all total errors in $*"
+                        fail "$num_errors_all total errors in $(compact_filenames $@)"
                 fi
         else
-                fail "no error matching '$error_match' in $*"
+                fail "no error matching '$error_match' in $(compact_filenames $@)"
         fi
 }
 
@@ -41,15 +41,15 @@ assert_pattern () {
         num_match=$(grep -iR "$match" "$@" 2>/dev/null | wc -l)
         if [ $num_match -gt 0 ]; then
                 if ((logged)); then
-                        win "$num_match string(s) matching '$match' in $*"
+                        win "$num_match string(s) matching '$match' in $(compact_filenames $@)"
                 else
-                        fail "$num_match string(s) matching '$match' in $*"
+                        fail "$num_match string(s) matching '$match' in $(compact_filenames $@)"
                 fi
         else
                 if ((logged)); then
-                        fail "no string matching '$match' in $*"
+                        fail "no string matching '$match' in $(compact_filenames $@)"
                 else
-                        win "no string matching '$match' in $*"
+                        win "no string matching '$match' in $(compact_filenames $@)"
                 fi
         fi
 }
