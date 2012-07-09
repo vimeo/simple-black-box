@@ -1,6 +1,7 @@
-# this default test is a good starting point for a simple json-configured 3-process daemon that listens on tcp:8080
-# this is supposed to represent a default configuration, where everything will just work. other tests can then
-# override specific things to introduce different behavior and assert accordingly.
+# this default test demonstrates a working, sample configuration for a
+# json-configured 3-process coffeescript-based daemon that listens on tcp:8080 and speaks http on that port.
+# * for testing other projects, modify this file as appropriate (preferrably in a different git branch named after the project)
+# * other tests can override specific things to introduce different behavior and assert accordingly.
 
 # callback, triggered at least from inside the main app
 debug_all_errors () {
@@ -29,8 +30,8 @@ listen_address=tcp:8080
 # so until then, match both master and workers
 # 'pgrep -f' compatible regex to capture all our "subject processes"
 subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
-http_pattern="port 80 and host localhost"
-# command to start the program from inside the sandbox (ignoring stdout/stderr here)
+http_pattern="port 8080 and host localhost"
+# command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
 process_launch="coffee $project.coffee"
 
 test_init () {
