@@ -14,7 +14,7 @@ fail () {
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         ((internal)) && die_error "internal assertion failed: $1"
         print_section
-        echo -e "${Red}[FAIL]${Color_Off}: $message"
+        echo -e "${Red}[FAIL]${Color_Off} $message"
         fails=$((fails+1))
         if((pause)); then
                 debug_all_errors
@@ -27,7 +27,7 @@ fail () {
 win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
-        ((!internal)) && print_section && echo -e "${Green}[WIN!]${Color_Off}: $message"
+        ((!internal)) && print_section && echo -e "${Green}[WIN!]${Color_Off} $message"
         wins=$((wins+1))
 }
 
@@ -37,7 +37,7 @@ debug () {
         [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
                 print_section
-                echo -e "${BBlack}[debug] $message$Color_Off"
+                echo -e "${BBlack}debug: $message$Color_Off"
         fi
 }
 
