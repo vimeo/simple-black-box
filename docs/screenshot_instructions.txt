@@ -1,0 +1,21 @@
+screenshot should be as compact as possible, but still look real enough and probably contain:
+some win
+some fail
+debug setup of http probe
+debug background swift container operation (creation/deletion)
+assertions on processes
+assert on listening
+assert on http
+assert on swift checksum or container/object existence
+assert on output pattern / error
+-p feature (but only once!), showing a list of all errors
+ending summary
+
+to take an updated screnshot:
+mv docs/testcase_for_screenshot.sh tests/swift_container_exists_before_lauching.sh
+config=/home/dieter/workspaces/eclipse/transcoder/vega/config.sh
+./sbb.sh -c $config -d -p swift_container_exists_before_lauching_example
+mv tests/swift_container_exists_before_lauching.sh docs/testcase_for_screenshot.sh
+
+copy paste this text for -p:
+on every failure, i can interact with the environment/processes as they are, to see what's going on and fix it
