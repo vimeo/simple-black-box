@@ -36,7 +36,7 @@ process_launch="coffee $project.coffee"
 test_init () {
         mkdir -p $sandbox
         rsync -au --delete $src/ $sandbox/
-        assert_exitcode test -f $sandbox/$project.coffee
+        internal=1 assert_exitcode test -f $sandbox/$project.coffee
 }
 
 # here you can alter the sandbox, modify config settings etc.
