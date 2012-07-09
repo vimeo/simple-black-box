@@ -11,9 +11,12 @@ debug_all_errors () {
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
 sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
+# filenames for log directory, stdout, stderr, http, ...
+# leave default unless it would conflict with existing files
 stdout=$sandbox/stdout
 stderr=$sandbox/stderr
-log= # optional
+log= # optional. if your app uses a logfile or directory, point to it here
+http=$sandbox/http # location of sniffed http traffic. only used when you set up the http probe
 config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
 config_src=$src/node_modules/${project}conf.json

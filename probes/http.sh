@@ -6,7 +6,7 @@ set_http_probe () {
         local http_pattern="$1" # to be fed to ngrep.  something like 'port 80 and host foo'
         [ -n "$http_pattern" ] || die_error "set_http_probe () needs a non-zero ngrep pattern to match http traffic"
         debug "set_http_probe '$http_pattern'"
-        sudo ngrep -W byline $http_pattern > $sandbox/sbb-http &
+        sudo ngrep -W byline $http_pattern > $http &
         internal=1 assert_num_procs "^ngrep.*$http_pattern" 1
 }
 
@@ -14,11 +14,11 @@ set_http_probe () {
 assert_all_http_responses () {
         local res_match="$1"
         [ -n "$res_match" ] || die_error "assert_all_responses () needs a non-zero egrep regex to match http response codes"
-        local num_match=$(egrep -c "^HTTP/1\.. $res_match" $sandbox/sbb-http)
-        num_all=$(egrep -c "^HTTP/1\.. " $sandbox/sbb-http)
+        local num_match=$(egrep -c "^HTTP/1\.. $res_match" $http)
+        num_all=$(egrep -c "^HTTP/1\.. " $http)
         if [ $num_match -ne $num_all ]; then
                 fail "only $num_match http response code(s) matching '$res_match' out of $num_all total"
-                egrep "^HTTP/1\.. " $sandbox/sbb-http | debug_stream "all http response codes:"
+                egrep "^HTTP/1\.. " $http | debug_stream "all http response codes:"
         else
                 win "all $num_match http response code(s) match '$res_match'"
         fi
@@ -36,8 +36,8 @@ assert_num_http_requests () {
         [[ $match_req_max =~ ^[0-9]+$ ]] || [ "$match_req_max" == "I" ] || die_error "assert_num_http_requests() \$3 must be a number or I(nfinity)! not $3"
         [ $match_req_max != "I" ] && [ $match_req_max -ge $match_req_min ] || die_error "assert_num_http_requests() match_req_min ($match_req_min) must be lower or equal to match_req_max ($match_req_max)"
         # in the ngrep output, you always first see the socket info and on the line below, either a http request or response
-        num_match_req=$(egrep -A 1 "$regex_socket_info" $sandbox/sbb-http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep -c "$match_req")
-        egrep -A 1 "$regex_socket_info" $sandbox/sbb-http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep "$match_req" | debug_stream "http requests matching '$match_req'"
+        num_match_req=$(egrep -A 1 "$regex_socket_info" $http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep -c "$match_req")
+        egrep -A 1 "$regex_socket_info" $http | egrep -v "$regex_socket_info" | grep -v ^HTTP | grep -v '^\-\-' | egrep "$match_req" | debug_stream "http requests matching '$match_req'"
         if [ $num_match_req -ge $match_req_min ]; then
                 if [ "$match_req_max" == "I" ] || [ $num_match_req -le $match_req_max ]; then
                         win "$num_match_req http request(s) matching '$match_req', which is between $match_req_min (min) and $match_req_max (max)"
@@ -90,7 +90,7 @@ assert_http_response_to () {
                                 fi
                         fi
                 fi
-        done < $sandbox/sbb-http
+        done < $http
         debug "responses_good: ${responses_good[@]}"
         debug "responses_bad: ${responses_bad[@]}"
         internal=1 assert_http_req_resp_found $num_match_req $num_res
