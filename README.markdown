@@ -86,4 +86,4 @@ to get in the right state until the timeout expires, retrying every decisecond
 
 ## Screenshot ##
 
-![Screenshot](http://i.imgur.com/jZ7uM.png)
+![Screenshot](http://i.imgur.com/wACnn.png)
