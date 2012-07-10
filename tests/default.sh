@@ -33,6 +33,8 @@ subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
 http_pattern="port 8080 and host localhost"
 # command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
 process_launch="coffee $project.coffee"
+# assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
+stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
 
 test_init () {
         mkdir -p $sandbox
@@ -49,10 +51,8 @@ test_start () {
         set_http_probe "$http_pattern"
         cd $sandbox
         $process_launch > $stdout 2> $stderr &
-        # even though those assert functions who need it have timeouts,
-        # we should be sure that the process doesn't start and dies quickly after.
-        # this sleep makes sure the env is "stable"
-        sleep 5s
+        debug "sleep $stabilize_sleep to let the environment 'stabilize'"
+        sleep $stabilize_sleep
         cd - >/dev/null
 }
 
