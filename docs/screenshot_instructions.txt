@@ -12,10 +12,10 @@ assert on output pattern / error
 ending summary
 
 to take an updated screnshot:
-mv docs/testcase_for_screenshot.sh tests/swift_container_exists_before_lauching.sh
+cp docs/testcase_for_screenshot.sh tests/swift_container_exists_before_launch.sh
 config=/home/dieter/workspaces/eclipse/transcoder/vega/config.sh
-./sbb.sh -c $config -d -p swift_container_exists_before_lauching_example
-mv tests/swift_container_exists_before_lauching.sh docs/testcase_for_screenshot.sh
+./sbb.sh -c $config -d -p swift_container_exists_before_launch
+rm tests/swift_container_exists_before_launch.sh
 
 copy paste this text for -p:
 on every failure, i can interact with the environment/processes as they are, to see what's going on and fix it
