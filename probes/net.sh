@@ -14,18 +14,18 @@ assert_listening () {
         debug "assert_listening on address $address (listening: $listening) -> lsof -sTCP:LISTEN -i $address"
         while [ $timer -ne $timeout ]; do
                 if ((listening)) && lsof -sTCP:LISTEN -i $address >/dev/null; then
-                        win "something is listening on $address (after $timer deciseconds)"
+                        win "something is listening on $address (after $timer ds)"
                         return
                 elif ((!listening)) && ! lsof -sTCP:LISTEN -i $address >/dev/null; then
-                        win "nothing is listening on $address (after $timer deciseconds)"
+                        win "nothing is listening on $address (after $timer ds)"
                         return
                 fi
                 sleep 0.1s
                 timer=$((timer+1))
         done
         if ((listening)); then
-                fail "nothing is listening on $address (waited $timer deciseconds)"
+                fail "nothing is listening on $address (after $timer ds)"
         else
-                fail "something is listening on $address (waited $timer deciseconds)"
+                fail "something is listening on $address (after $timer ds)"
         fi
 }
