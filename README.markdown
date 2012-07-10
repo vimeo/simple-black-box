@@ -83,3 +83,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 ```
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/ngrep
 ```
+
+## Screenshot ##
+
+![Screenshot](http://i.imgur.com/jZ7uM.png)
