@@ -13,11 +13,11 @@ assert_num_procs () {
         while [ $timer -ne $timeout ]; do
                 num_procs_match=$(pgrep -fc "$1")
                 if [ $num_procs_match -eq $num_procs_match_goal ]; then
-                        win "$num_procs_match running process(es) matching '$proc_match' (after $timer deciseconds)"
+                        win "$num_procs_match running process(es) matching '$proc_match' (after $timer ds)"
                         return
                 fi
                 sleep 0.1s
                 timer=$((timer+1))
         done
-        fail "$num_procs_match running process(es) matching '$proc_match' instead of desired $num_procs_match_goal (waited $timer deciseconds)"
+        fail "$num_procs_match running process(es) matching '$proc_match' instead of desired $num_procs_match_goal (after $timer ds)"
 }

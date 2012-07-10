@@ -1,6 +1,7 @@
-# this default test is a good starting point for a simple json-configured 3-process daemon that listens on tcp:8080
-# this is supposed to represent a default configuration, where everything will just work. other tests can then
-# override specific things to introduce different behavior and assert accordingly.
+# this default test demonstrates a working, sample configuration for a
+# json-configured 3-process coffeescript-based daemon that listens on tcp:8080 and speaks http on that port.
+# * for testing other projects, modify this file as appropriate (preferrably in a different git branch named after the project)
+# * other tests can override specific things to introduce different behavior and assert accordingly.
 
 # callback, triggered at least from inside the main app
 debug_all_errors () {
@@ -10,10 +11,13 @@ debug_all_errors () {
 # needed vars: $src, $test, $project
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
-sandbox=/tmp/$project_$test_id # mirror of src which we can pollute with logfiles and modifications
+sandbox=/tmp/$project-$test_id # mirror of src which we can pollute with logfiles and modifications
+# filenames for log directory, stdout, stderr, http, ...
+# leave default unless it would conflict with existing files
 stdout=$sandbox/stdout
 stderr=$sandbox/stderr
 log=$sandbox/log
+http=$sandbox/http # location of sniffed http traffic. only used when you set up the http probe
 uploads=$sandbox/uploads
 config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
@@ -35,13 +39,15 @@ listen_address=tcp:8080
 # 'pgrep -f' compatible regex to capture all our "subject processes"
 subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
 http_pattern="-d tun0 port $swift_port and host $swift_host"
-# command to start the program from inside the sandbox (ignoring stdout/stderr here)
+# command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
 process_launch="coffee $project.coffee"
+# assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
+stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
 
 test_init () {
         mkdir -p $sandbox
         rsync -au --delete $src/ $sandbox/
-        assert_exitcode test -f $sandbox/$project.coffee
+        internal=1 assert_exitcode test -f $sandbox/$project.coffee
         rm -rf $log
         rm -rf uploads
 }
@@ -55,10 +61,8 @@ test_start () {
         set_http_probe "$http_pattern"
         cd $sandbox
         $process_launch > $stdout 2> $stderr &
-        # even though those assert functions who need it have timeouts,
-        # we should be sure that the process doesn't start and dies quickly after.
-        # this sleep makes sure the env is "stable"
-        sleep 5s
+        debug "sleep $stabilize_sleep to let the environment 'stabilize'"
+        sleep $stabilize_sleep
         cd - >/dev/null
 }
 

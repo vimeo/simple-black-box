@@ -32,7 +32,7 @@ json_debug_var () {
         local key=$2
         [ -n "$file" -a -f "$file" ] || die_error "json_debug_var \$1 must be the config file, not '$1'"
         [ -n "$key" ] || die_error "json_debug_var \$2 must be a non-zero config key, not '$2'"
-        debug "json $file $key : $(grep "^\"$key\": " "$file")"
+        debug "json $file: $(grep "^\"$key\": " "$file")"
 }
 
 # $1 config file
