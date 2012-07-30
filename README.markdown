@@ -85,6 +85,11 @@ to get in the right state until the timeout expires, retrying every decisecond
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/ngrep
 ```
 
+## Examples ##
+
+* see the `vega` branch, which is a real-life case we use to test an upload server named vega.
+[see how it compares to master](https://github.com/Vimeo/simple-black-box/compare/master...vega) to get a better understanding.
+
 ## Screenshot ##
 
 ![Screenshot](http://i.imgur.com/wACnn.png)
