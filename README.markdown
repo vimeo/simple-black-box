@@ -7,8 +7,9 @@
 
 ## workflow ##
 
-* executes the program with different arguments and environment variables, capturing logs, stderr and stdout streams
-* use input plugins that set up the environment before starting the app, or interact with it while it's running.
+* executes the program in a sandbox with a specific configuration, arguments and environment variables.
+* captures logs, stderr and stdout streams, http traffic, etc
+* programmatically interact with the app while it's running through various interfaces (commands, http, ...)
 * use probes to validate behavior
 
 ## inputs ##
@@ -82,7 +83,13 @@ to get in the right state until the timeout expires, retrying every decisecond
 * for http probe, allow passwordless use of ngrep in /etc/sudoers:
 ```
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/ngrep
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^ngrep
 ```
+
+## Examples ##
+
+* see the `vega` branch, which is a real-life case we use to test an upload server named vega.
+[see how it compares to master](https://github.com/Vimeo/simple-black-box/compare/master...vega) to get a better understanding.
 
 ## Screenshot ##
 
