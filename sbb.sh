@@ -72,7 +72,10 @@ if [ $# -gt 0 ]; then
 else
         # run all tests that can run on their own, starting with the default one
         run_test default
-        for t in tests/!(generic_*|default).sh; do
+        shopt -s nullglob
+        tests=(tests/!(generic_*|default).sh)
+        shopt -u nullglob
+        for t in "${tests[@]}"; do
                 run_test $(basename $t .sh)
         done
 fi
