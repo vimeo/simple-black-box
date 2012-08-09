@@ -35,7 +35,7 @@ stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
 
 test_init () {
         mkdir -p $sandbox $output
-        rsync -au --delete $src/ $sandbox/
+        rsync -a --delete $src/ $sandbox/
         internal=1 assert_exitcode test -f $sandbox/$project.coffee
 }
 
