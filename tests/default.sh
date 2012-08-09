@@ -1,5 +1,6 @@
 # this default test demonstrates a working, sample configuration for a
-# json-configured 3-process coffeescript-based daemon that listens on tcp:8080 and speaks http on that port.
+# json-configured 3-process coffeescript-based daemon that listens on tcp:8080 and speaks http on that port, and also
+# communicates to a backend openstack swift service over http
 # * for testing other projects, modify this file as appropriate (preferrably in a different git branch named after the project)
 # * other tests can override specific things to introduce different behavior and assert accordingly.
 
@@ -26,7 +27,7 @@ listen_address=tcp:8080
 # so until then, match both master and workers
 # 'pgrep -f' compatible regex to capture all our "subject processes"
 subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
-http_pattern="port 8080 and host localhost"
+http_pattern_swift="port 8080 and host localhost"
 # command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
 process_launch="coffee $project.coffee"
 # assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
@@ -44,7 +45,7 @@ test_pre () {
 }
 
 test_start () {
-        set_http_probe "$http_pattern"
+        set_http_probe swift "$http_pattern_swift"
         cd $sandbox
         $process_launch > $output/stdout 2> $output/stderr &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
@@ -61,7 +62,7 @@ test_while () {
 test_stop () {
         kill_graceful "$subject_process"
         assert_num_procs "$subject_process" $num_procs_down
-        remove_http_probe "$http_pattern"
+        remove_http_probe "$http_pattern_swift"
         assert_listening "$listen_address" 0
 }
 
