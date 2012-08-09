@@ -27,7 +27,7 @@
 * assert exit code of commands, useful for arbitrary commands/scripts
 * check checksums of files on the filesystem or blobs in a swift cluster
 
-note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox
+note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox and $output
 some assert functions of probes allow a wait time expressed in deciseconds.  they will give your environment time
 to get in the right state until the timeout expires, retrying every decisecond
 

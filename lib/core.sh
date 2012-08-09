@@ -60,7 +60,8 @@ run_test () {
         source tests/default.sh
         source tests/$test.sh
         echo -e "${BBlue}Running test $test$Color_Off"
-        echo -e "${BBlack}sandbox is $sandbox$Color_Off"
+        echo -e "${BBlack}sandbox : $sandbox$Color_Off"
+        echo -e "${BBlack}output  : $output$Color_Off"
         for section in init pre start while stop post; do
                 sbb_section=$section
                 test_$section
@@ -108,25 +109,25 @@ show_summary () {
 }
 
 # assuming files like so: /tmp/blah/foo /tmp/blah/bar foobar, will condense to /tmp/blah/{foo,bar} foobar
-# but only when the path contains the sandbox. (this depends on $sandbox not having an ending /)
+# but only when the path contains the output dir. (this depends on $output not having an ending /)
 # note this function does not care whether the files actually exist or not. it's just a display thing
 # $@ filenames
 compact_filenames () {
         compact=()
         normal=()
         for f in $@; do
-               f_short=${f/$sandbox\/}
+               f_short=${f/$output\/}
                [ "$f_short" == "$f" ] && normal+=("$f") || compact+=("$f_short")
         done
         if [ ${#compact[@]} -eq 0 ]; then
                 echo ${normal[@]}
         elif [ ${#compact[@]} -eq 1 ]; then
-                echo $sandbox/${compact[0]} ${normal[@]}
+                echo $output/${compact[0]} ${normal[@]}
         else
                 local str
                 for i in ${compact[@]}; do
                         [ -n "$str" ] && str="$str,$i" || str=$i
                 done
-                echo "$sandbox/{$str} ${normal[@]}"
+                echo "$output/{$str} ${normal[@]}"
        fi
 }

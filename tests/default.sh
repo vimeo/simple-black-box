@@ -5,19 +5,15 @@
 
 # callback, triggered at least from inside the main app
 debug_all_errors () {
-        grep -Ri --color=never error $stdout $stderr $log 2>/dev/null | debug_stream "all errors:"
+        grep -Ri --color=never error $output/stdout $output/stderr $log 2>/dev/null | debug_stream "all errors:"
 }
 
 # needed vars: $src, $test, $project
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
-sandbox=/tmp/$project-$test_id # mirror of src which we can pollute with logfiles and modifications
-# filenames for log directory, stdout, stderr, http, ...
-# leave default unless it would conflict with existing files
-stdout=$sandbox/stdout
-stderr=$sandbox/stderr
+sandbox=/tmp/$project-$test_id # mirror of src in which we can make config/source modifications
+output=${sandbox}-output # sbb logfiles (stdin, stdout, probe output - as <type>-key - , etc) go here
 log= # optional. if your app uses a logfile or directory, point to it here
-http=$sandbox/http # location of sniffed http traffic. only used when you set up the http probe
 config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
 config_src=$src/node_modules/${project}conf.json
@@ -37,7 +33,7 @@ process_launch="coffee $project.coffee"
 stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
 
 test_init () {
-        mkdir -p $sandbox
+        mkdir -p $sandbox $output
         rsync -au --delete $src/ $sandbox/
         internal=1 assert_exitcode test -f $sandbox/$project.coffee
 }
@@ -50,7 +46,7 @@ test_pre () {
 test_start () {
         set_http_probe "$http_pattern"
         cd $sandbox
-        $process_launch > $stdout 2> $stderr &
+        $process_launch > $output/stdout 2> $output/stderr &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
         sleep $stabilize_sleep
         cd - >/dev/null
@@ -71,6 +67,6 @@ test_stop () {
 
 # perform operations which you don't want to be catched by the http probe and/or which are better suited when the subject process is down
 test_post () {
-        assert_no_errors $stdout $stderr $log
+        assert_no_errors $output/stdout $output/stderr $log
         debug_all_errors
 }
