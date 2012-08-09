@@ -76,7 +76,8 @@ assert_object_md5sum () {
         [ -n "$container" ] || die_error "assert_object_md5sum() needs a non-zero swift container name as \$2"
         [ -n "$object" ] || die_error "assert_object_md5sum() needs a non-zero swift object name as \$3"
         [ ${#md5sum} -eq 32 ] || die_error "assert_object_md5sum() \$4 must be an md5sum of 32 characters, not '$4'"
-        local md5sum_swift=$(swift $swift_args download $container -o - $object | md5sum | cut -f1 -d' ')
+        # can put "Object 'container/object' not found" on stderr
+        local md5sum_swift=$(swift $swift_args download $container -o - $object 2>/dev/null | md5sum | cut -f1 -d' ')
         if [ $md5sum_swift = $md5sum ]; then
                 win "swift object '$object' in container '$container' has md5sum $md5sum"
         else
