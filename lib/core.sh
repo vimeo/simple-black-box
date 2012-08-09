@@ -48,7 +48,7 @@ debug_stream () {
         [ -n "$1" ] || die_error "debug_stream() \$1 must be a non-zero message"
         debug "$message"
         while read line; do
-                debug "$line"
+                [ -n "$line" ] && debug "$line"
         done
 }
 
