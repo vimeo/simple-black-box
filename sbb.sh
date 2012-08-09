@@ -73,7 +73,7 @@ else
         # run all tests starting with the default one
         run_test default
         shopt -s nullglob
-        tests=(tests/!default.sh)
+        tests=(tests/!(default*).sh)
         shopt -u nullglob
         for t in "${tests[@]}"; do
                 run_test $(basename $t .sh)
