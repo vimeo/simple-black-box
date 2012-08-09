@@ -12,7 +12,7 @@ assert_listening () {
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$3 must be a number! not $timeout"
         timer=0
         debug "assert_listening on address $address (listening: $listening) -> lsof -i $address"
-        while [ $timer -ne $timeout ]; do
+        while true; do
                 if ((listening)) && lsof -i $address | grep -q LISTEN; then
                         win "something is listening on $address (after $timer ds)"
                         return
@@ -20,6 +20,7 @@ assert_listening () {
                         win "nothing is listening on $address (after $timer ds)"
                         return
                 fi
+                [ $timer -lt $timeout ] || break
                 sleep 0.1s
                 timer=$((timer+1))
         done

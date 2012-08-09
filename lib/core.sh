@@ -81,7 +81,8 @@ kill_graceful () {
         debug "kill_graceful '$regex' $timeout"
         pkill -f "$regex" 2>/dev/null
         timer=0
-        while [ $timer -ne $timeout ] && pgrep -f "$regex" >/dev/null; do
+        while pgrep -f "$regex" >/dev/null; do
+                [ $timer -lt $timeout ] || break
                 sleep 0.1s
                 timer=$((timer+1))
         done

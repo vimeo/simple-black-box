@@ -10,12 +10,13 @@ assert_num_procs () {
         [[ "$num_procs_match_goal" =~ ^[0-9]+$ ]] || die_error "assert_num_procs() \$2 must be a number! not $num_procs_match_goal"
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$3 must be a number! not $timeout"
         timer=0
-        while [ $timer -ne $timeout ]; do
+        while true; do
                 num_procs_match=$(pgrep -fc "$1")
                 if [ $num_procs_match -eq $num_procs_match_goal ]; then
                         win "$num_procs_match running process(es) matching '$proc_match' (after $timer ds)"
                         return
                 fi
+                [ $timer -lt $timeout ] || break
                 sleep 0.1s
                 timer=$((timer+1))
         done
