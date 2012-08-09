@@ -78,12 +78,12 @@ assert_http_response_to () {
         num_res=0
         client_sockets=() # list of 'client ip:port' used to do matching requests, this allows us to find the responses
         while read line; do
-                if egrep -q "$regex_socket_info" <<< "$line"; then
+                if [[ $line =~ $regex_socket_info ]]; then
                         socket_info=$line
                         read line
-                        if ! grep -q "^HTTP" <<< $line; then
+                        if ! [[ $line =~ ^HTTP ]]; then
                                 # $line is a request
-                                if egrep -q "$match_req" <<< "$line"; then
+                                if [[ $line =~ $match_req ]]; then
                                         client_sockets+=($(awk "/$regex_socket_info/ {print \$2}" <<< "$socket_info"))
                                         num_match_req=$((num_match_req+1))
                                 fi
@@ -92,9 +92,10 @@ assert_http_response_to () {
                                 if [ ${#client_sockets[@]} -gt 0 ]; then
                                         client_sockets_still_notfound=()
                                         for client_socket in ${client_sockets[@]}; do
-                                                if egrep -q "T $regex_client_socket -> $client_socket( |$)" <<< "$socket_info"; then
+                                                regex="T $regex_client_socket -> $client_socket( |$)"
+                                                if [[ $socket_info =~ $regex ]]; then
                                                         num_res=$((num_res+1))
-                                                        egrep -q "$match_res" <<< $line && responses_good+=("$line") || responses_bad+=("$line")
+                                                        [[ $line =~ $match_res ]] && responses_good+=("$line") || responses_bad+=("$line")
                                                 else
                                                         client_sockets_still_notfound+=($client_socket)
                                                 fi
