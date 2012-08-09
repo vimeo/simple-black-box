@@ -17,7 +17,6 @@ output=${sandbox}-output # sbb logfiles (stdin, stdout, probe output - as <type>
 log= # optional. if your app uses a logfile or directory, point to it here
 config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
-config_src=$src/node_modules/${project}conf.json
 
 # probe / assertion parameters
 num_procs_up=3
