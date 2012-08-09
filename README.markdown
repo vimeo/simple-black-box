@@ -45,13 +45,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 
 ## tests ##
 
-* tests/default.sh get sourced before every real test, it defines default behavior and demonstrates config options
-* generic_ tests are tests which you can reuse for multiple occasions,
-  for example a test that checks the effect of making a given config parameter
-  value unset, each of these will document which parameters they accept
-* specifically, the default generic_var* tests allow you to assert (absence of) errors and number of processes running
-* by default, runs all tests that don't start with generic_ found in the test folder.
-  your tests can just set the needed vars and source a generic test
+* tests/default.sh gets sourced before every real test, it defines default behavior and demonstrates config options
 * test cases may not have whitespace in their names.
 
 ## extra features ##
