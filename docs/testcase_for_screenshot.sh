@@ -14,6 +14,7 @@ test_post () {
         assert_num_http_requests swift "^PUT" 1 1
         assert_http_response_to swift 'GET /auth/v1.0' 200
         assert_num_http_requests swift 'GET /auth/v1.0' $num_procs_up $num_procs_up # every process will do an auth
+        assert_num_udp_statsd_requests statsdev 'upload.requests.put:1|c' 0 0
         assert_no_errors $output/stdout $output/stderr $log
        # assert_pattern "container.*$container.*already existing" 1 $output/stdout $output/stderr $log
         assert_pattern "created.*$container" 0 $output/stdout $output/stderr $log

@@ -28,6 +28,7 @@ listen_address=tcp:8080
 # 'pgrep -f' compatible regex to capture all our "subject processes"
 subject_process="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
 http_pattern_swift="port 8080 and host localhost"
+udp_statsd_pattern_statsdev="port 8125 and host localhost"
 # command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
 process_launch="coffee $project.coffee"
 # assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
@@ -46,6 +47,7 @@ test_pre () {
 
 test_start () {
         set_http_probe swift "$http_pattern_swift"
+        set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
         cd $sandbox
         $process_launch > $output/stdout 2> $output/stderr &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
@@ -63,6 +65,7 @@ test_stop () {
         kill_graceful "$subject_process"
         assert_num_procs "$subject_process" $num_procs_down
         remove_http_probe "$http_pattern_swift"
+        remove_udp_statsd_probe "$udp_statsd_pattern_statsdev"
         assert_listening "$listen_address" 0
 }
 
