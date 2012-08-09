@@ -68,7 +68,7 @@ test_stop () {
         assert_listening "$listen_address" 0
 }
 
-# perform operations which you don't want to be catched by the http probe and/or which are better suited when the subject process is down
+# perform operations which you don't want to be caught by the http probe and/or which are better suited when the subject process is down
 test_post () {
         assert_no_errors $output/stdout $output/stderr $log
         debug_all_errors
