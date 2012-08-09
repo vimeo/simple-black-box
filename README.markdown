@@ -83,7 +83,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 * for http probe, allow passwordless use of ngrep in /etc/sudoers:
 ```
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/ngrep
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^ngrep
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^ngrep*
 ```
 
 ## Examples ##
