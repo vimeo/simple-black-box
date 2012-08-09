@@ -45,13 +45,14 @@ assert_object_exists () {
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "assert_object_exists() \$5 must be a number! not $timeout"
         timer=0
         # the regex matching is not safe if $object contains chars with special meanings in regexes!
-        while [ $timer -ne $timeout ]; do
+        while true; do
                 # can put "Container 'foo' not found" on stderr
                 if swift $swift_args list "$container" 2>/dev/null | grep -q "^$object$"; then
                         ((existing)) && win "1 swift object '$object' in container '$container' (after $timer ds)" && return
                 else
                         ! ((existing)) && win "no swift object '$object' in container '$container' (after $timer ds)" && return
                 fi
+                [ $timer -lt $timeout ] || break
                 sleep 0.1s
                 timer=$((timer+1))
         done
