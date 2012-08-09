@@ -129,7 +129,7 @@ assert_http_req_resp_found () {
 # $1 http pattern (as specified to set_http_probe)
 remove_http_probe () {
         local http_pattern="$1"
-        [ -n "$http_pattern" ] || die_error "remote_http_probe () needs a non-zero ngrep pattern that was used to match http traffic"
+        [ -n "$http_pattern" ] || die_error "remove_http_probe () needs a non-zero ngrep pattern that was used to match http traffic"
         debug "remove_http_probe '$http_pattern'"
         #FIXME https://sourceforge.net/tracker/?func=detail&aid=3537747&group_id=10752&atid=110752
         # should not require root here.
