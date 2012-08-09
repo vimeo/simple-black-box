@@ -11,12 +11,12 @@ assert_listening () {
         check_is_in $2 0 1 || die_error "assert_listening needs the number 1 or 0 as \$2, not $2"
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$3 must be a number! not $timeout"
         timer=0
-        debug "assert_listening on address $address (listening: $listening) -> lsof -sTCP:LISTEN -i $address"
+        debug "assert_listening on address $address (listening: $listening) -> lsof -i $address"
         while [ $timer -ne $timeout ]; do
-                if ((listening)) && lsof -sTCP:LISTEN -i $address >/dev/null; then
+                if ((listening)) && lsof -i $address | grep -q LISTEN; then
                         win "something is listening on $address (after $timer ds)"
                         return
-                elif ((!listening)) && ! lsof -sTCP:LISTEN -i $address >/dev/null; then
+                elif ((!listening)) && ! lsof -i $address | grep -q LISTEN; then
                         win "nothing is listening on $address (after $timer ds)"
                         return
                 fi

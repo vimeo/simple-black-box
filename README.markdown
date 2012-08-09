@@ -8,7 +8,7 @@
 ## workflow ##
 
 * executes the program in a sandbox with a specific configuration, arguments and environment variables.
-* captures logs, stderr and stdout streams, http traffic, etc
+* captures logs, stderr and stdout streams, http/udp statsd traffic, etc
 * programmatically interact with the app while it's running through various interfaces (commands, http, ...)
 * use probes to validate behavior
 
@@ -26,8 +26,9 @@
 * check wether processes are listening on specified sockets
 * assert exit code of commands, useful for arbitrary commands/scripts
 * check checksums of files on the filesystem or blobs in a swift cluster
+* assert on statsd traffic
 
-note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox
+note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox and $output
 some assert functions of probes allow a wait time expressed in deciseconds.  they will give your environment time
 to get in the right state until the timeout expires, retrying every decisecond
 
@@ -44,13 +45,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 
 ## tests ##
 
-* tests/default.sh get sourced before every real test, it defines default behavior and demonstrates config options
-* generic_ tests are tests which you can reuse for multiple occasions,
-  for example a test that checks the effect of making a given config parameter
-  value unset, each of these will document which parameters they accept
-* specifically, the default generic_var* tests allow you to assert (absence of) errors and number of processes running
-* by default, runs all tests that don't start with generic_ found in the test folder.
-  your tests can just set the needed vars and source a generic test
+* tests/default.sh gets sourced before every real test, it defines default behavior and demonstrates config options
 * test cases may not have whitespace in their names.
 
 ## extra features ##
@@ -72,6 +67,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 
 * python-swiftclient for swift tasks
 * ngrep, sudo for http probe
+* tcpdump, sudo for udp_statsd probe
 
 ## extra notes ##
 
@@ -83,8 +79,14 @@ to get in the right state until the timeout expires, retrying every decisecond
 * for http probe, allow passwordless use of ngrep in /etc/sudoers:
 ```
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/ngrep
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^ngrep
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^ngrep*
 ```
+* for udp_statsd probe:
+```
+%wheel ALL=(ALL) NOPASSWD: /usr/sbin/tcpdump
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^tcpdump*
+```
+
 
 ## Examples ##
 
