@@ -4,10 +4,7 @@
 # * for testing other projects, modify this file as appropriate (preferrably in a different git branch named after the project)
 # * other tests can override specific things to introduce different behavior and assert accordingly.
 
-# callback, triggered at least from inside the main app
-debug_all_errors () {
-        grep -Ri --color=never error $output/stdout $output/stderr $log 2>/dev/null | debug_stream "all errors:"
-}
+source lib/test-helpers.sh
 
 # needed vars: $src, $test, $project
 # test identifier, sandbox, config and i/o locations
