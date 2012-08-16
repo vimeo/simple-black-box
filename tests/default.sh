@@ -44,6 +44,7 @@ test_pre () {
 test_start () {
         set_http_probe swift "$http_pattern_swift"
         set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
+        set_logstash_probe
         cd $sandbox
         $process_launch > $output/stdout 2> $output/stderr &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
@@ -62,6 +63,7 @@ test_stop () {
         assert_num_procs "$subject_process" $num_procs_down
         remove_http_probe "$http_pattern_swift"
         remove_udp_statsd_probe "$udp_statsd_pattern_statsdev"
+        remove_logstash_probe
         assert_listening "$listen_address" 0
 }
 
