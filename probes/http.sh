@@ -1,5 +1,6 @@
 regex_client_socket='[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}:[[:digit:]]+' #'<ip address>:<port>'
-regex_socket_info="^T $regex_client_socket -> $regex_client_socket( |$)"
+regex_timestamp=".......... ..:..:........."
+regex_socket_info="^T $regex_timestamp $regex_client_socket -> $regex_client_socket( |$)"
 
 # $1 key: a string you'll use to refer to this particular probe instance
 #  pick a name that corresponds to the app/service your app is talking to
@@ -10,7 +11,7 @@ set_http_probe () {
         [ -n "$key" ] || die_error "set_http_probe () needs a non-zero reference key"
         [ -n "$http_pattern" ] || die_error "set_http_probe () needs a non-zero ngrep pattern to match http traffic"
         debug "set_http_probe $key '$http_pattern'"
-        sudo ngrep -W byline $http_pattern > $output/http_$key &
+        sudo ngrep -t -W byline $http_pattern > $output/http_$key &
         internal=1 assert_num_procs "^ngrep.*$http_pattern" 1
 }
 
@@ -84,7 +85,7 @@ assert_http_response_to () {
                         if ! [[ $line =~ ^HTTP ]]; then
                                 # $line is a request
                                 if [[ $line =~ $match_req ]]; then
-                                        client_sockets+=($(awk "/$regex_socket_info/ {print \$2}" <<< "$socket_info"))
+                                        client_sockets+=($(awk "/$regex_socket_info/ {print \$4}" <<< "$socket_info"))
                                         num_match_req=$((num_match_req+1))
                                 fi
                         else
@@ -92,7 +93,7 @@ assert_http_response_to () {
                                 if [ ${#client_sockets[@]} -gt 0 ]; then
                                         client_sockets_still_notfound=()
                                         for client_socket in ${client_sockets[@]}; do
-                                                regex="T $regex_client_socket -> $client_socket( |$)"
+                                                regex="T $regex_timestamp $regex_client_socket -> $client_socket( |$)"
                                                 if [[ $socket_info =~ $regex ]]; then
                                                         num_res=$((num_res+1))
                                                         [[ $line =~ $match_res ]] && responses_good+=("$line") || responses_bad+=("$line")
@@ -133,6 +134,6 @@ remove_http_probe () {
         debug "remove_http_probe '$http_pattern'"
         #FIXME https://sourceforge.net/tracker/?func=detail&aid=3537747&group_id=10752&atid=110752
         # should not require root here.
-        sudo pkill -f "^ngrep -W byline $http_pattern"
+        sudo pkill -f "^ngrep -t -W byline $http_pattern"
         internal=1 assert_num_procs "^ngrep.*$http_pattern" 0
 }
