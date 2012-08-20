@@ -5,6 +5,10 @@
   not by interacting with your API, i.e. this is programming language agnostic.
 * written because I couldn't find anything that [suits my needs](http://stackoverflow.com/questions/11136464/black-box-behavior-testing-a-daemon-in-various-configurations)
 
+## Screenshot ##
+
+![Screenshot](http://i.imgur.com/wACnn.png)
+
 ## workflow ##
 
 * executes the program in a sandbox with a specific configuration, arguments and environment variables.
@@ -89,12 +93,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/pkill -f ^tcpdump*
 ```
 
-
 ## Examples ##
 
 * see the `vega` branch, which is a real-life case we use to test an upload server named vega.
 [see how it compares to master](https://github.com/Vimeo/simple-black-box/compare/master...vega) to get a better understanding.
-
-## Screenshot ##
-
-![Screenshot](http://i.imgur.com/wACnn.png)
