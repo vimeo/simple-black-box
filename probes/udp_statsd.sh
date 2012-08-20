@@ -9,7 +9,7 @@ set_udp_statsd_probe () {
         [ -n "$key" ] || die_error "set_udp_statsd_probe () needs a non-zero reference key"
         [ -n "$pattern" ] || die_error "set_udp_statsd_probe () needs a non-zero pattern to match the traffic"
         debug "set_udp_statsd_probe $key '$pattern'"
-        sudo tcpdump -n -A $pattern 2>&1 | egrep -v '^(tcpdump|listening on|$|[^ ]+ packets)' > $output/udp_statsd_$key &
+        sudo tcpdump -tttt -n -A $pattern 2>&1 | egrep -v '^(tcpdump|listening on|$|[^ ]+ packets)' > $output/udp_statsd_$key &
         internal=1 assert_num_procs "^tcpdump.*$pattern" 1
 }
 
@@ -43,6 +43,6 @@ remove_udp_statsd_probe () {
         local pattern="$1"
         [ -n "$pattern" ] || die_error "remove_udp_statsd_probe () needs a non-zero tcpdump pattern that was used to match udp_statsd traffic"
         debug "remove_udp_statsd_probe '$pattern'"
-        sudo pkill -f "^tcpdump -n -A $pattern"
+        sudo pkill -f "^tcpdump -tttt -n -A $pattern"
         internal=1 assert_num_procs "^tcpdump.*$pattern" 0
 }

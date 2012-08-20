@@ -27,6 +27,7 @@
 * assert exit code of commands, useful for arbitrary commands/scripts
 * check checksums of files on the filesystem or blobs in a swift cluster
 * assert on statsd traffic
+* logstash: grabs events from all other probes and uses logstash to make it easier to search/browse them
 
 note: they get all variables as arguments to functions, no global vars, with the exception of $sandbox and $output
 some assert functions of probes allow a wait time expressed in deciseconds.  they will give your environment time
@@ -68,6 +69,7 @@ to get in the right state until the timeout expires, retrying every decisecond
 * python-swiftclient for swift tasks
 * ngrep, sudo for http probe
 * tcpdump, sudo for udp_statsd probe
+* java and http://semicomplete.com/files/logstash/logstash-1.1.1-monolithic.jar this file, in your current dir, for logstash support
 
 ## extra notes ##
 

@@ -9,7 +9,7 @@ source lib/test-helpers.sh
 # needed vars: $src, $test, $project
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
-sandbox=/tmp/$project-$test_id # mirror of src in which we can make config/source modifications
+sandbox=$prefix-$test_id # mirror of src in which we can make config/source modifications
 output=${sandbox}-output # sbb logfiles (stdin, stdout, probe output - as <type>-key - , etc) go here
 log=$sandbox/log
 uploads=$sandbox/uploads

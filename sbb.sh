@@ -14,6 +14,7 @@ return=
 debug=0
 verbose=0
 pause=0
+logstash=0
 
 # $1 exit code (default: 0)
 usage() {
@@ -27,12 +28,13 @@ OPTIONS:
 -h      Show this message
 -d      show debug info
 -p      Pause at each fail, to allow for manual inspection
+-s      Enable a logstash instance to capture and index output of all probes
 -v      Verbose
 EOF
     exit ${1:-0}
 }
 
-while getopts "hdpvc:" OPTION; do
+while getopts "hdpsvc:" OPTION; do
      case $OPTION in
          h)
              usage
@@ -48,6 +50,9 @@ while getopts "hdpvc:" OPTION; do
              ;;
          v)
              verbose=1
+             ;;
+         s)
+             logstash=1
              ;;
          ?)
              usage 2
@@ -66,10 +71,12 @@ if [ $# -gt 0 ]; then
         for case in $@; do
                 [ -n "$case" -a -f "tests/$case.sh" ] || die_error "no such testcase: $case"
         done
+        ((logstash)) && set_logstash_probe
         for case in $@; do
                 run_test $case
         done
 else
+        ((logstash)) && set_logstash_probe
         # run all tests starting with the default one
         run_test default
         shopt -s nullglob
@@ -80,3 +87,4 @@ else
         done
 fi
 show_summary
+((logstash)) && remove_logstash_probe_interactive

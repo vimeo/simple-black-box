@@ -2,3 +2,4 @@
 
 project=
 src=$HOME/code/$project
+prefix=/tmp/$project
