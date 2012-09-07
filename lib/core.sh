@@ -1,6 +1,10 @@
 wins=0
 fails=0
 testcases=0
+color_debug=$BBlack
+color_fail=$Red
+color_win=$Green
+color_header=$BBlue
 
 # looks for global var $sbb_section
 print_section () {
@@ -14,7 +18,7 @@ fail () {
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         ((internal)) && die_error "internal assertion failed: $1"
         print_section
-        echo -e "${Red}[FAIL]${Color_Off} $message"
+        echo -e "${color_fail}[FAIL]${Color_Off} $message"
         fails=$((fails+1))
         if((pause)); then
                 debug_all_errors
@@ -29,7 +33,7 @@ win () {
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
         ((internal)) && return
         print_section
-        echo -e "${Green}[WIN!]${Color_Off} $message"
+        echo -e "${color_win}[WIN!]${Color_Off} $message"
         wins=$((wins+1))
 }
 
@@ -39,7 +43,7 @@ debug () {
         [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
                 print_section
-                echo -e "${BBlack}debug: $message$Color_Off"
+                echo -e "${color_debug}debug: $message$Color_Off"
         fi
 }
 
@@ -61,9 +65,9 @@ run_test () {
         [[ "$test" =~ [\ ] ]] && die_error "testcase may not have whitespace in the name (no specific reason, just makes everybodies life a bit easier)."
         source tests/default.sh
         source tests/$test.sh
-        echo -e "${BBlue}Running test $test$Color_Off"
-        echo -e "${BBlack}sandbox : $sandbox$Color_Off"
-        echo -e "${BBlack}output  : $output$Color_Off"
+        echo -e "${color_header}Running test $test$Color_Off"
+        echo -e "${color_debug}sandbox : $sandbox$Color_Off"
+        echo -e "${color_debug}output  : $output$Color_Off"
         for section in init pre start while stop post; do
                 sbb_section=$section
                 test_$section
@@ -106,8 +110,8 @@ at_least_one_readable_file () {
 }
 
 show_summary () {
-        color=${Green}
-        [ $fails -gt 0 ] && color=${Red}
+        color=${color_win}
+        [ $fails -gt 0 ] && color=${color_fail}
         echo -e "${color}SUMMARY: $wins WIN, $fails FAIL in $testcases testcases${Color_Off}"
 }
 
