@@ -75,6 +75,27 @@ debug_stream () {
         done
 }
 
+# $1 something executable (program, function, ..)  which must return true
+# $2 decisecond timeout in (default 50)
+# return $1's last exit code
+wait_until () {
+        local f=$1
+        local timeout=${2:-50}
+        [[ -n $f ]] && declare -f | which --read-functions "$f" &>/dev/null || die_error "wait_until() \$1 must be something executable! not $1"
+        [[ $timeout =~ ^[0-9]+$ ]] || die_error "wait_until() \$2 must be a number! not $2"
+        timer=0
+        local f_ret=
+        while true; do
+            $f
+            f_ret=$?
+            [[ $f_ret -eq 0 ]] && break
+            [ $timer -lt $timeout ] || break
+            sleep 0.1s
+            timer=$((timer+1))
+        done
+        return $f_ret
+}
+
 # $1 test case
 run_test () {
         local test=$1
@@ -103,12 +124,10 @@ kill_graceful () {
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$2 must be a number! not $2"
         debug "kill_graceful '$regex' $timeout"
         pkill -f "$regex" 2>/dev/null
-        timer=0
-        while pgrep -f "$regex" >/dev/null; do
-                [ $timer -lt $timeout ] || break
-                sleep 0.1s
-                timer=$((timer+1))
-        done
+        process_not_running () {
+            ! pgrep -f "$regex" >/dev/null
+        }
+        wait_until process_not_running $timeout
         pkill -9 -f "$regex" 2>/dev/null
 }
 

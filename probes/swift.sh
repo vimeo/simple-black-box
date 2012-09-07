@@ -43,24 +43,23 @@ assert_object_exists () {
         [ -n "$object" ] || die_error "assert_object_exists() needs a non-zero swift object name as \$3"
         check_is_in $existing 0 1 || die_error "assert_object_exists() needs the number 1 or 0 (or empty for default of 1) as \$4, not $4"
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "assert_object_exists() \$5 must be a number! not $timeout"
-        timer=0
-        # the regex matching is not safe if $object contains chars with special meanings in regexes!
-        while true; do
+        desired_object_exists () {
+                # the regex matching is not safe if $object contains chars with special meanings in regexes!
                 # can put "Container 'foo' not found" on stderr
                 if swift $swift_args list "$container" 2>/dev/null | grep -q "^$object$"; then
-                        ((existing)) && win "1 swift object '$object' in container '$container' (after $timer ds)" && return
+                        ((existing)) && win "1 swift object '$object' in container '$container' (after $timer ds)" && return 0
                 else
-                        ! ((existing)) && win "no swift object '$object' in container '$container' (after $timer ds)" && return
+                        ! ((existing)) && win "no swift object '$object' in container '$container' (after $timer ds)" && return 0
                 fi
-                [ $timer -lt $timeout ] || break
-                sleep 0.1s
-                timer=$((timer+1))
-        done
-	if ((existing)); then
-		fail "no swift object '$object' in container '$container' (waited $timer deciseconds)"
-	else
-		fail "1 swift object '$object' in container '$container' (waited $timer deciseconds)"
-	fi
+                return 1
+        }
+        if ! wait_until desired_object_exists $timeout; then
+                if ((existing)); then
+                    fail "no swift object '$object' in container '$container' (waited $timer deciseconds)"
+                else
+                    fail "1 swift object '$object' in container '$container' (waited $timer deciseconds)"
+                fi
+        fi
 }
 
 # $1 swift_args
