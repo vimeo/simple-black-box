@@ -110,7 +110,8 @@ at_least_one_readable_file () {
 }
 
 show_summary () {
-        color=${color_win}
+        color=${color_debug}
+        [ $wins -gt 0 ] && color=${color_win}
         [ $fails -gt 0 ] && color=${color_fail}
         echo -e "${color}SUMMARY: $wins WIN, $fails FAIL in $testcases testcases${Color_Off}"
 }
