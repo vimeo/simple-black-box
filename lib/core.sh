@@ -37,13 +37,30 @@ win () {
         wins=$((wins+1))
 }
 
-# $1 message
+# $1 message (mandatory)
 debug () {
         local message=$1
         [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
                 print_section
                 echo -e "${color_debug}debug: $message$Color_Off"
+        fi
+}
+
+# $1 message (optional)
+debug_begin () {
+        local message=$1
+        if((debug)); then
+                print_section
+                echo -en "${color_debug}debug: $message"
+        fi
+}
+
+# $1 message (optional)
+debug_end () {
+        local message=$1
+        if((debug)); then
+                echo -e "$message$Color_Off"
         fi
 }
 
