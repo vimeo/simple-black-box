@@ -27,7 +27,9 @@ fail () {
 win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
-        ((!internal)) && print_section && echo -e "${Green}[WIN!]${Color_Off} $message"
+        ((internal)) && return
+        print_section
+        echo -e "${Green}[WIN!]${Color_Off} $message"
         wins=$((wins+1))
 }
 
