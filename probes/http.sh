@@ -108,7 +108,7 @@ assert_http_response_to () {
         done < $output/http_$ref
         debug "responses_good: ${responses_good[@]}"
         debug "responses_bad: ${responses_bad[@]}"
-        internal=1 assert_http_req_resp_found $key $num_match_req $num_res
+        internal=1 assert_http_req_resp_found $ref $num_match_req $num_res "matching '$match_res'"
         if [ ${#responses_bad[@]} -eq 0 ]; then
                 win "http_$ref: all $num_match_req request(s) matching '$match_req' have a response matching '$match_res'"
         else
@@ -119,12 +119,15 @@ assert_http_response_to () {
 # $1 ref: a reference string for this particular probe instance
 # $2 number of requests
 # $3 number of corresponding responses
+# $4 spec: arbitrary string that describes the requests, to clarify to the user
 # for internal use
 assert_http_req_resp_found () {
         [ -n "$1" ] || die_error "assert_http_req_resp_found (): \$1 must be an instance reference string"
         [[ $2 =~ ^[0-9]+$ ]] || die_error "assert_http_req_resp_found(): \$2 must be a number to denote number of requests, not '$2'"
         [[ $3 =~ ^[0-9]+$ ]] || die_error "assert_http_req_resp_found(): \$3 must be a number to denote number of responses, not '$3'"
-        [ $2 -ne $3 ] && fail "http_$1: internal error: found $2 request(s) but $3 response(s). this number should match"
+        local spec=
+        [[ -n $4 ]] && spec=" $4"
+        [ $2 -ne $3 ] && fail "http_$1: internal error: found $2 request(s)$spec but $3 response(s). this number should match"
 }
 
 # $1 http pattern (as specified to set_http_probe)
