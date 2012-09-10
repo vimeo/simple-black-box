@@ -104,3 +104,10 @@ all output files from/for probes should be named like: <probe>_<reference>
 * <probe> should not contain underscores
 * <reference> reference string for a particular probe instance, something you'll often choose yourself
   example: 'swift' for swift traffic, 'main' for the main app, etc
+
+variables related to probe instances should be named like <probe>_<parameter>[_<reference>]
+reference is optional if you only use 1 instance (like you only run 1 process that you want to monitor).
+variables not strictly meant for probes are probably also better off following this scheme if that makes sense.
+examples: $process_num_up_ssh to denote how much ssh processes should be up if all is normal, or
+$process_launch_foo would contain the command to launch your foo process or just $process_launch if you're not launching
+anything else
