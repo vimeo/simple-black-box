@@ -49,10 +49,15 @@ upload_file_curl () {
         # expect statsd get/put increments and data counter increments
         ticket=up-$(date +%s)000
         test_file=$(mktemp --tmpdir $project-$test_id.XXXX)
-        debug "creating testfile. $(dd if=/dev/urandom of=$test_file bs=1M count=2 2>&1 | grep -v records)"
+        debug_begin "creating testfile $test_file. "
+        debug_end "$(dd if=/dev/urandom of=$test_file bs=1M count=2 2>&1 | grep -v records)"
+        debug_begin 'checksumming testfile. '
         md5sum=$(md5sum $test_file | cut -d' ' -f1)
-        debug "uploading testfile. $(curl -s -S -X PUT --data-binary @$test_file "http://localhost:8080/upload?ticket_id=$ticket" 2>&1)"
-        debug "comleting upload.   $(curl -s -S "http://localhost:8080/upload_complete?ticket_id=$ticket" 2>&1)"
+        debug_end $md5sum
+        debug_begin 'uploading testfile to http://localhost:8080. '
+        debug_end "$(curl -s -S -X PUT --data-binary @$test_file "http://localhost:8080/upload?ticket_id=$ticket" 2>&1)"
+        debug_begin 'completing upload. '
+        debug_end "$(curl -s -S "http://localhost:8080/upload_complete?ticket_id=$ticket" 2>&1)"
 }
 
 # some snippets to refer to from callback functions
