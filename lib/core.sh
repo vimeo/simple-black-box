@@ -1,6 +1,10 @@
 wins=0
 fails=0
 testcases=0
+color_debug=$BBlack
+color_fail=$Red
+color_win=$Green
+color_header=$BBlue
 
 # looks for global var $sbb_section
 print_section () {
@@ -14,7 +18,7 @@ fail () {
         [ -n "$1" ] || die_error "fail() \$1 must be a non-zero message"
         ((internal)) && die_error "internal assertion failed: $1"
         print_section
-        echo -e "${Red}[FAIL]${Color_Off} $message"
+        echo -e "${color_fail}[FAIL]${Color_Off} $message"
         fails=$((fails+1))
         if((pause)); then
                 debug_all_errors
@@ -27,17 +31,36 @@ fail () {
 win () {
         local message=$1
         [ -n "$1" ] || die_error "win() \$1 must be a non-zero message"
-        ((!internal)) && print_section && echo -e "${Green}[WIN!]${Color_Off} $message"
+        ((internal)) && return
+        print_section
+        echo -e "${color_win}[WIN!]${Color_Off} $message"
         wins=$((wins+1))
 }
 
-# $1 message
+# $1 message (mandatory)
 debug () {
         local message=$1
         [ -n "$1" ] || die_error "debug() \$1 must be a non-zero message"
         if((debug)); then
                 print_section
-                echo -e "${BBlack}debug: $message$Color_Off"
+                echo -e "${color_debug}debug: $message$Color_Off"
+        fi
+}
+
+# $1 message (optional)
+debug_begin () {
+        local message=$1
+        if((debug)); then
+                print_section
+                echo -en "${color_debug}debug: $message"
+        fi
+}
+
+# $1 message (optional)
+debug_end () {
+        local message=$1
+        if((debug)); then
+                echo -e "$message$Color_Off"
         fi
 }
 
@@ -52,6 +75,27 @@ debug_stream () {
         done
 }
 
+# $1 something executable (program, function, ..)  which must return true
+# $2 decisecond timeout in (default 50)
+# return $1's last exit code
+wait_until () {
+        local f=$1
+        local timeout=${2:-50}
+        [[ -n $f ]] && declare -f | which --read-functions "$f" &>/dev/null || die_error "wait_until() \$1 must be something executable! not $1"
+        [[ $timeout =~ ^[0-9]+$ ]] || die_error "wait_until() \$2 must be a number! not $2"
+        timer=0
+        local f_ret=
+        while true; do
+            $f
+            f_ret=$?
+            [[ $f_ret -eq 0 ]] && break
+            [ $timer -lt $timeout ] || break
+            sleep 0.1s
+            timer=$((timer+1))
+        done
+        return $f_ret
+}
+
 # $1 test case
 run_test () {
         local test=$1
@@ -59,9 +103,9 @@ run_test () {
         [[ "$test" =~ [\ ] ]] && die_error "testcase may not have whitespace in the name (no specific reason, just makes everybodies life a bit easier)."
         source tests/default.sh
         source tests/$test.sh
-        echo -e "${BBlue}Running test $test$Color_Off"
-        echo -e "${BBlack}sandbox : $sandbox$Color_Off"
-        echo -e "${BBlack}output  : $output$Color_Off"
+        echo -e "${color_header}Running test $test$Color_Off"
+        echo -e "${color_debug}sandbox : $sandbox$Color_Off"
+        echo -e "${color_debug}output  : $output$Color_Off"
         for section in init pre start while stop post; do
                 sbb_section=$section
                 test_$section
@@ -80,12 +124,10 @@ kill_graceful () {
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$2 must be a number! not $2"
         debug "kill_graceful '$regex' $timeout"
         pkill -f "$regex" 2>/dev/null
-        timer=0
-        while pgrep -f "$regex" >/dev/null; do
-                [ $timer -lt $timeout ] || break
-                sleep 0.1s
-                timer=$((timer+1))
-        done
+        process_not_running () {
+            ! pgrep -f "$regex" >/dev/null
+        }
+        wait_until process_not_running $timeout
         pkill -9 -f "$regex" 2>/dev/null
 }
 
@@ -104,8 +146,9 @@ at_least_one_readable_file () {
 }
 
 show_summary () {
-        color=${Green}
-        [ $fails -gt 0 ] && color=${Red}
+        color=${color_debug}
+        [ $wins -gt 0 ] && color=${color_win}
+        [ $fails -gt 0 ] && color=${color_fail}
         echo -e "${color}SUMMARY: $wins WIN, $fails FAIL in $testcases testcases${Color_Off}"
 }
 

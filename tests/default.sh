@@ -10,7 +10,7 @@ source lib/test-helpers.sh
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
 sandbox=$prefix-$test_id # mirror of src in which we can make config/source modifications
-output=${sandbox}-output # sbb logfiles (stdin, stdout, probe output - as <type>-key - , etc) go here
+output=${sandbox}-output # per-testcase sbb probe files go here
 log=$sandbox/log
 uploads=$sandbox/uploads
 config_backend=json
@@ -49,7 +49,7 @@ test_start () {
         set_http_probe swift "$http_pattern_swift"
         set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
         cd $sandbox
-        $process_launch > $output/stdout 2> $output/stderr &
+        $process_launch > $output/stdout_vega 2> $output/stderr_vega &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
         sleep $stabilize_sleep
         upload_file_curl

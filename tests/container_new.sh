@@ -20,9 +20,9 @@ test_post () {
         assert_num_udp_statsd_requests statsdev 'upload.concurrent_uploads.*:1|g' 1 1
         assert_num_udp_statsd_requests statsdev 'upload.concurrent_uploads.*:0|g' 1 1
         assert_num_udp_statsd_requests statsdev 'upload.requests.get-upload_complete:1|c' 1 1
-        assert_no_errors $output/stdout $output/stderr $log $js
-        assert_pattern "container.*$container.*already existed" 0 $output/stdout $output/stderr $log
-        assert_pattern "created.*$container" 1 $output/stdout $output/stderr $log
+        assert_no_errors $output/stdout_* $output/stderr_* $log $js
+        assert_pattern "container.*$container.*already existed" 0 $output/stdout_* $output/stderr_* $log
+        assert_pattern "created.*$container" 1 $output/stdout_vega $output/stderr_vega $log
         debug "deleting container $container: $(swift $swift_args delete $container 2>&1)"
         internal=1 assert_container_exists "$swift_args" $container 0
         debug_all_errors

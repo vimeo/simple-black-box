@@ -1,7 +1,7 @@
 # useful functions which testcases can refer to
 
 debug_all_errors () {
-        grep -Ri --color=never error $output/stdout $output/stderr $log 2>/dev/null | debug_stream "all errors:"
+        grep -Ri --color=never error $output/stdout_* $output/stderr_* $log 2>/dev/null | debug_stream "all errors:"
 }
 
 load_params_from_config () {
@@ -71,7 +71,7 @@ test_post_ok () {
         assert_num_udp_statsd_requests statsdev 'upload.concurrent_uploads.*:1|g' 1 1
         assert_num_udp_statsd_requests statsdev 'upload.concurrent_uploads.*:0|g' 1 1
         assert_num_udp_statsd_requests statsdev 'upload.requests.get-upload_complete:1|c' 1 1
-        assert_no_errors $output/stdout $output/stderr $log $js
+        assert_no_errors $output/stdout_* $output/stderr_* $log $js
 }
 
 # $1 error msg
@@ -86,15 +86,15 @@ test_post_ok_but_no_statsd () {
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container/$ticket HTTP" 201
         assert_num_http_requests swift "^PUT" 2 2
         assert_num_udp_statsd_requests statsdev '.*' 0 0
-        [ -n "$error" ] && assert_only_error "$error" $output/stdout $output/stderr $log
-        [ -z "$error" ] && assert_no_errors $output/stdout $output/stderr $log $js
+        [ -n "$error" ] && assert_only_error "$error" $output/stdout_* $output/stderr_* $log
+        [ -z "$error" ] && assert_no_errors $output/stdout_* $output/stderr_* $log $js
 }
 
 # $1 error msg
 test_post_die_during_startup () {
         local error=$1
         assert_num_http_requests swift '.*' 0 0
-        assert_only_error "$error" $output/stdout $output/stderr $log
+        assert_only_error "$error" $output/stdout_* $output/stderr_* $log
 }
 
 # $1 error msg
@@ -105,5 +105,5 @@ test_post_die_at_auth () {
         assert_http_response_to swift 'GET /auth/v1.0' "$match_auth_response"
         assert_num_http_requests swift 'GET /auth/v1.0' 1 1
         assert_num_http_requests swift '.*' 1 1
-        assert_only_error "$error" $output/stdout $output/stderr $log
+        assert_only_error "$error" $output/stdout_* $output/stderr_* $log
 }

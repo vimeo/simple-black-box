@@ -66,6 +66,14 @@ source "$config" || die_error "failed to source config $config"
 [ -n "$project" ] || die_error "\$project must be set to the name of your project"
 [ -d "$src" ] || die_error "\$src must be set to a directory containing your project, not '$src'"
 
+show_killed () {
+    echo "killed.."
+    show_summary
+    exit 1
+}
+
+trap show_killed INT TERM
+
 shift $(($OPTIND-1))
 if [ $# -gt 0 ]; then
         for case in $@; do
