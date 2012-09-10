@@ -10,7 +10,7 @@ set_logstash_probe () {
         remove_logstash_probe
         internal=1 assert_listening "tcp:9292" 0 0 # port must be available for use
         # an index needs to be created right from the start (otherwise we get errors), so use stdin.
-        echo starting logstash at $(date) | $logstash_cmd 'elasticsearch:///?local' > $prefix-logstash-stdout 2> $prefix-logstash-stderr &
+        echo starting logstash at $(date) | $logstash_cmd 'elasticsearch:///?local' > $prefix-stdout_logstash 2> $prefix-stderr_logstash &
         internal=1 assert_num_procs "^$logstash_cmd" 1
         echo "sleeping 30s to let logstash stabilize. sorry about that..."
         sleep 30

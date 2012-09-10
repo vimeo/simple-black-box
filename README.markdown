@@ -97,3 +97,10 @@ to get in the right state until the timeout expires, retrying every decisecond
 
 * see the `vega` branch, which is a real-life case we use to test an upload server named vega.
 [see how it compares to master](https://github.com/Vimeo/simple-black-box/compare/master...vega) to get a better understanding.
+
+## Rules ##
+
+all output files from/for probes should be named like: <probe>_<reference>
+* <probe> should not contain underscores
+* <reference> reference string for a particular probe instance, something you'll often choose yourself
+  example: 'swift' for swift traffic, 'main' for the main app, etc

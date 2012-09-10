@@ -10,7 +10,7 @@ source lib/test-helpers.sh
 # test identifier, sandbox, config and i/o locations
 test_id="$(cd "$src" && git describe --always --dirty)_test_${test}"
 sandbox=$prefix-$test_id # mirror of src in which we can make config/source modifications
-output=${sandbox}-output # sbb logfiles (stdin, stdout, probe output - as <type>-key - , etc) go here
+output=${sandbox}-output # per-testcase sbb probe files go here
 log= # optional. if your app uses a logfile or directory, point to it here
 config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
@@ -45,7 +45,7 @@ test_start () {
         set_http_probe swift "$http_pattern_swift"
         set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
         cd $sandbox
-        $process_launch > $output/stdout 2> $output/stderr &
+        $process_launch > $output/stdout_vega 2> $output/stderr_vega &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
         sleep $stabilize_sleep
         cd - >/dev/null
@@ -67,6 +67,6 @@ test_stop () {
 
 # perform operations which you don't want to be caught by the http probe and/or which are better suited when the subject process is down
 test_post () {
-        assert_no_errors $output/stdout $output/stderr $log
+        assert_no_errors $output/stdout_* $output/stderr_* $log
         debug_all_errors
 }
