@@ -2,8 +2,8 @@ test_pre () {
         ${config_backend}_change_var $config_sandbox swift_user '"system:foobardoesnotexist"'
 }
 test_while () {
-        assert_num_procs "$subject_process" $num_procs_down
-        assert_listening "$listen_address" 0
+        assert_num_procs "$process_pattern" 0
+        assert_listening "$net_listen_addr" 0
 }
 
 test_post () {

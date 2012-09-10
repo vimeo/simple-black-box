@@ -10,7 +10,7 @@ test_post () {
         assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
-        assert_num_http_requests swift 'GET /auth/v1.0' $num_procs_up $num_procs_up # every process will do an auth
+        assert_num_http_requests swift 'GET /auth/v1.0' $process_num_up $process_num_up # every process will do an auth
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container HTTP" 201
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container/$ticket HTTP" 201
         assert_num_http_requests swift "^PUT" 2 2

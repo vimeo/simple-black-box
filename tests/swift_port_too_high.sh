@@ -3,8 +3,8 @@ test_pre () {
 }
 
 test_while () {
-        assert_num_procs "$subject_process" $num_procs_down
-        assert_listening "$listen_address" 0
+        assert_num_procs "$process_pattern" 0
+        assert_listening "$net_listen_addr" 0
 }
 
 test_post () {
