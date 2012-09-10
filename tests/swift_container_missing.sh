@@ -3,11 +3,12 @@ test_pre () {
 }
 
 test_while () {
-        assert_num_procs "$process_pattern" 0
-        assert_listening "$net_listen_addr" 0
+        assert_num_procs "$process_pattern_vega" $process_num_up_vega
+        assert_num_procs "$process_pattern_uploader" 0
+        assert_listening "$net_listen_addr" 1
 }
 
 test_post () {
-        test_post_die_during_startup "ERROR:.*missing.*swift_container"
+        test_post_uploader_dies_during_startup "ERROR:.*missing.*swift_container"
         debug_all_errors
 }

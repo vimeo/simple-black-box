@@ -3,7 +3,8 @@ test_pre () {
 }
 
 test_while () {
-        assert_num_procs "$process_pattern" $process_num_up
+        assert_num_procs "$process_pattern_vega" $process_num_up_vega
+        assert_num_procs "$process_pattern_uploader" $process_num_up_uploader
         assert_listening "$net_listen_addr" 1
 }
 

@@ -10,7 +10,7 @@ test_post () {
         assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
-        assert_num_http_requests swift 'GET /auth/v1.0' $process_num_up $process_num_up # every process will do an auth
+        assert_num_http_requests swift 'GET /auth/v1.0' 1 1
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container HTTP" 201
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container/$ticket HTTP" 201
         assert_num_http_requests swift "^PUT" 2 2
@@ -22,7 +22,7 @@ test_post () {
         assert_num_udp_statsd_requests statsdev 'upload.requests.get-upload_complete:1|c' 1 1
         assert_no_errors $output/stdout_* $output/stderr_* $log $js
         assert_pattern "container.*$container.*already existed" 0 $output/stdout_* $output/stderr_* $log
-        assert_pattern "created.*$container" 1 $output/stdout_vega $output/stderr_vega $log
+        assert_pattern "created.*$container" 1 $output/stdout_uploader $output/stderr_uploader $log
         debug "deleting container $container: $(swift $swift_args delete $container 2>&1)"
         internal=1 assert_container_exists "$swift_args" $container 0
         debug_all_errors

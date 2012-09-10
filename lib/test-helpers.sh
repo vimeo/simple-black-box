@@ -43,6 +43,7 @@ load_correct_params_from_config () {
                         udp_statsd_pattern_statsdev="-i any dst $statsd_host"
                 fi
         fi
+        http_pattern_vega="-d lo host localhost and port 8080"
 }
 
 upload_file_curl () {
@@ -66,7 +67,7 @@ test_post_ok () {
         assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
-        assert_num_http_requests swift 'GET /auth/v1.0' $process_num_up $process_num_up # every process will do an auth
+        assert_num_http_requests swift 'GET /auth/v1.0' 1 1
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container HTTP" 202
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container/$ticket HTTP" 201
         assert_num_http_requests swift "^PUT" 2 2
@@ -86,7 +87,7 @@ test_post_ok_but_no_statsd () {
         assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
-        assert_num_http_requests swift 'GET /auth/v1.0' $process_num_up $process_num_up # every process will do an auth
+        assert_num_http_requests swift 'GET /auth/v1.0' 1 1
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container HTTP" 202
         assert_http_response_to swift "^PUT /v1/AUTH_system/$container/$ticket HTTP" 201
         assert_num_http_requests swift "^PUT" 2 2
@@ -96,7 +97,21 @@ test_post_ok_but_no_statsd () {
 }
 
 # $1 error msg
-test_post_die_during_startup () {
+test_post_vega_dies_during_startup () {
+        local error=$1
+        assert_num_http_requests swift '.*' 3 3
+        assert_only_error "$error" $output/stdout_* $output/stderr_* $log
+}
+
+# $1 error msg
+test_post_uploader_dies_during_startup () {
+        local error=$1
+        assert_num_http_requests swift '.*' 0 0
+        assert_only_error "$error" $output/stdout_* $output/stderr_* $log
+}
+
+# $1 error msg
+test_post_vega_and_uploader_die_during_startup () {
         local error=$1
         assert_num_http_requests swift '.*' 0 0
         assert_only_error "$error" $output/stdout_* $output/stderr_* $log
@@ -104,11 +119,18 @@ test_post_die_during_startup () {
 
 # $1 error msg
 # $2 match_auth_response
-test_post_die_at_auth () {
+test_post_uploader_dies_at_auth () {
         local error=$1
         local match_auth_response=$2
         assert_http_response_to swift 'GET /auth/v1.0' "$match_auth_response"
         assert_num_http_requests swift 'GET /auth/v1.0' 1 1
         assert_num_http_requests swift '.*' 1 1
+        assert_only_error "$error" $output/stdout_* $output/stderr_* $log
+}
+
+# $1 error msg
+test_post_ok_but_no_swift () {
+        local error=$1
+        assert_num_http_requests swift '.*' 0 0
         assert_only_error "$error" $output/stdout_* $output/stderr_* $log
 }

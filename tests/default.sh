@@ -17,14 +17,17 @@ config_backend=json
 config_sandbox=$sandbox/node_modules/${project}conf.json
 
 # probe / assertion parameters
-process_num_up=3
+process_num_up_vega=3
+process_num_up_uploader=1
 net_listen_addr=tcp:8080
 # node cluster doesn't kill children properly yet https://github.com/joyent/node/pull/2908
 # so until then, match both master and workers
 # 'pgrep -f' compatible regex to capture all our "subject processes"
-process_pattern="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
+process_pattern_vega="^node /usr/.*/coffee ($sandbox/)?$project.coffee"
+process_pattern_uploader="^node /usr/.*/coffee ($sandbox/)?uploader.coffee"
 # command to start the program from inside the sandbox (don't consume stdout/stderr here, see later)
-process_launch="coffee $project.coffee"
+process_launch_vega="coffee $project.coffee"
+process_launch_uploader="coffee uploader.coffee"
 # assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
 stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
 
@@ -46,9 +49,11 @@ test_pre () {
 test_start () {
         load_params_from_config
         set_http_probe swift "$http_pattern_swift"
+        set_http_probe vega "$http_pattern_vega"
         set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
         cd $sandbox
-        $process_launch > $output/stdout_vega 2> $output/stderr_vega &
+        $process_launch_vega > $output/stdout_vega 2> $output/stderr_vega &
+        $process_launch_uploader > $output/stdout_uploader 2> $output/stderr_uploader &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
         sleep $stabilize_sleep
         upload_file_curl
@@ -57,14 +62,18 @@ test_start () {
 
 # do assertions which are executed while the subject process should be up and running
 test_while () {
-        assert_num_procs "$process_pattern" $process_num_up
+        assert_num_procs "$process_pattern_vega" $process_num_up_vega
+        assert_num_procs "$process_pattern_uploader" $process_num_up_uploader
         assert_listening "$net_listen_addr" 1
 }
 
 test_stop () {
-        kill_graceful "$process_pattern"
-        assert_num_procs "$process_pattern" 0
+        kill_graceful "$process_pattern_vega"
+        kill_graceful "$process_pattern_uploader"
+        assert_num_procs "$process_pattern_vega" 0
+        assert_num_procs "$process_pattern_uploader" 0
         remove_http_probe "$http_pattern_swift"
+        remove_http_probe "$http_pattern_vega"
         remove_udp_statsd_probe "$udp_statsd_pattern_statsdev"
         assert_listening "$net_listen_addr" 0
 }
