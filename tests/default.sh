@@ -1,5 +1,5 @@
 # this default test demonstrates a working, sample configuration for a
-# json-configured 3-process coffeescript-based daemon that listens on tcp:8080 and speaks http on that port, and also
+# json-configured 3-process coffeescript-based daemon named $project.coffee listening on tcp:8080 and which speaks http on that port and also
 # communicates to a backend openstack swift service over http
 # * for testing other projects, modify this file as appropriate (preferrably in a different git branch named after the project)
 # * other tests can override specific things to introduce different behavior and assert accordingly.
@@ -45,7 +45,7 @@ test_start () {
         set_http_probe swift "$http_pattern_swift"
         set_udp_statsd_probe statsdev "$udp_statsd_pattern_statsdev"
         cd $sandbox
-        $process_launch > $output/stdout_vega 2> $output/stderr_vega &
+        $process_launch > $output/stdout_$project 2> $output/stderr_$project &
         debug "sleep $stabilize_sleep to let the environment 'stabilize'"
         sleep $stabilize_sleep
         cd - >/dev/null
