@@ -7,7 +7,7 @@ test_pre () {
 
 test_post () {
         assert_container_exists "$swift_args" $container
-        assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
+        assert_object_exists "$swift_args" $container $ticket 1 0
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
         assert_num_http_requests swift 'GET /auth/v1.0' 1 1

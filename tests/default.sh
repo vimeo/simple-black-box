@@ -29,7 +29,7 @@ process_pattern_uploader="^node /usr/.*/coffee ($sandbox/)?uploader.coffee"
 process_launch_vega="coffee $project.coffee"
 process_launch_uploader="coffee uploader.coffee"
 # assure no false results by program starting and dieing quickly after. allow the environment to "stabilize"
-stabilize_sleep=5 # any sleep-compatible NUMBER[SUFFIX] string
+stabilize_sleep=50 # number of ds to max wait for the environment to stabilize after starting up
 
 # callback functions
 test_init () {
@@ -46,6 +46,10 @@ test_pre () {
         true
 }
 
+everything_is_up () {
+    is_listening $net_listen_addr && desired_num_procs "$process_pattern_uploader" $process_num_up_uploader
+}
+
 test_start () {
         load_params_from_config
         set_http_probe swift "$http_pattern_swift"
@@ -54,8 +58,9 @@ test_start () {
         cd $sandbox
         $process_launch_vega > $output/stdout_vega 2> $output/stderr_vega &
         $process_launch_uploader > $output/stdout_uploader 2> $output/stderr_uploader &
-        debug "sleep $stabilize_sleep to let the environment 'stabilize'"
-        sleep $stabilize_sleep
+        debug_begin "wait until environment came up successfully ( max $stabilize_sleep ds)...."
+        wait_until everything_is_up $stabilize_sleep
+        debug_end "ret $? after $timer ds"
         upload_file_curl
         cd - >/dev/null
 }
@@ -67,7 +72,26 @@ test_while () {
         assert_listening "$net_listen_addr" 1
 }
 
+# returns true only when vega is def. done with its work (i.e. processing 1 upload)
+vega_is_done () {
+    ticket=$(awk '/completing upload/ {print $NF}' $log/* 2>/dev/null)
+    [[ -n $ticket ]] || return 1
+    [ -d $sandbox/uploads_done/$ticket ]
+}
+
+# returns true only when uploader is def. done.
+uploader_is_done () {
+    grep -q "uploads_done/$ticket processed" $output/stdout_uploader
+}
+
 test_stop () {
+        # TODO: in testcases where want the processes to stop or something to break, this causes needlessly long waits
+        debug_begin "waiting a bit for vega - if running - to do its job"
+        wait_until vega_is_done 50
+        debug_end "..ret $? after $timer ds"
+        debug_begin "waiting a bit for uploader - if running - to do its job"
+        wait_until uploader_is_done 1200
+        debug_end "..ret $? after $timer ds"
         kill_graceful "$process_pattern_vega"
         kill_graceful "$process_pattern_uploader"
         assert_num_procs "$process_pattern_vega" 0

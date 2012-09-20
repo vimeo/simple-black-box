@@ -64,7 +64,7 @@ upload_file_curl () {
 # some snippets to refer to from callback functions
 test_post_ok () {
         assert_container_exists "$swift_args" $container
-        assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
+        assert_object_exists "$swift_args" $container $ticket 1 0
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
         assert_num_http_requests swift 'GET /auth/v1.0' 1 1
@@ -84,7 +84,7 @@ test_post_ok () {
 test_post_ok_but_no_statsd () {
         local error=$1
         assert_container_exists "$swift_args" $container
-        assert_object_exists "$swift_args" $container $ticket # node app needs about 30s to push the 2MB file
+        assert_object_exists "$swift_args" $container $ticket 1 0
         assert_object_md5sum "$swift_args" $container $ticket $md5sum
         assert_http_response_to swift 'GET /auth/v1.0' 200
         assert_num_http_requests swift 'GET /auth/v1.0' 1 1
