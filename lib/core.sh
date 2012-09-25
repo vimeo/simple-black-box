@@ -77,11 +77,11 @@ debug_stream () {
 }
 
 # $1 something executable (program, function, ..)  which must return true
-# $2 decisecond timeout in (default 50)
+# $2 decisecond timeout
 # return $1's last exit code
 wait_until () {
         local f=$1
-        local timeout=${2:-50}
+        local timeout=$2
         [[ -n $f ]] && declare -f | which --read-functions "$f" &>/dev/null || die_error "wait_until() \$1 must be something executable! not $1"
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "wait_until() \$2 must be a number! not $2"
         timer=0
