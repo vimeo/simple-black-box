@@ -44,6 +44,7 @@ while getopts "hdpsvc:" OPTION; do
              ;;
          d)
              debug=1
+             libui_sh_init cli /tmp 0 0 1
              ;;
          p)
              pause=1

@@ -19,6 +19,7 @@ fail () {
         ((internal)) && die_error "internal assertion failed: $1"
         print_section
         echo -e "${color_fail}[FAIL]${Color_Off} $message"
+        debug "$(print_stacktrace)"
         fails=$((fails+1))
         if((pause)); then
                 debug_all_errors
