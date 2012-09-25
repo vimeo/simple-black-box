@@ -74,8 +74,7 @@ test_while () {
 
 # returns true only when vega is def. done with its work (i.e. processing 1 upload)
 vega_is_done () {
-    ticket=$(awk '/completing upload/ {print $NF}' $log/* 2>/dev/null)
-    [[ -n $ticket ]] || return 1
+    [[ -n $ticket ]] || die_error "\$ticket should be set in the file upload step"
     [ -d $sandbox/uploads_done/$ticket ]
 }
 
