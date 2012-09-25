@@ -10,5 +10,5 @@ test_while () {
 
 test_post () {
         test_post_uploader_dies_during_startup "error.*not set to an integer"
-        debug_all_errors
+        test_post_finish
 }

@@ -10,5 +10,5 @@ test_while () {
 
 test_post () {
         test_post_vega_and_uploader_die_during_startup "ERROR:.*missing.*statsd_host"
-        debug_all_errors
+        test_post_finish
 }

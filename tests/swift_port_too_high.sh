@@ -10,5 +10,5 @@ test_while () {
 
 test_post () {
         test_post_ok_but_no_swift "ECONNREFUSED"
-        debug_all_errors
+        test_post_finish
 }

@@ -9,5 +9,5 @@ test_while () {
 
 test_post () {
         test_post_uploader_dies_at_auth "Trouble connecting to openstack: Error: request unsuccessful, statusCode: 401" 'HTTP/1.1 401 Unauthorized'
-        debug_all_errors
+        test_post_finish
 }

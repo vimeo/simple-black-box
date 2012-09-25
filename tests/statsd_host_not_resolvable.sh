@@ -3,4 +3,5 @@ test_pre () {
 }
 test_post () {
         test_post_ok_but_no_statsd getaddrinfo
+        test_post_finish
 }

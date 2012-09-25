@@ -101,8 +101,13 @@ test_stop () {
         assert_listening "$net_listen_addr" 0
 }
 
+test_post_finish () {
+        internal=1 assert_exitcode rm -f $test_file
+        debug_all_errors
+}
+
 # perform operations which you don't want to be caught by the http probe and/or which are better suited when the subject process is down
 test_post () {
         test_post_ok
-        debug_all_errors
+        test_post_finish
 }

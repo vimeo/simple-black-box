@@ -6,5 +6,5 @@ test_pre () {
 }
 test_post () {
         test_post_ok_but_no_statsd ""
-        debug_all_errors
+        test_post_finish
 }

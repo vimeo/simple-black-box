@@ -11,5 +11,5 @@ test_post () {
         assert_pattern "created.*$container" 0 $output/stdout_* $output/stderr_* $log
         debug "deleting container $container: $(swift $swift_args delete $container 2>&1)"
         internal=1 assert_container_exists "$swift_args" $container 0
-        debug_all_errors
+        test_post_finish
 }
