@@ -4,22 +4,27 @@
 # $1 swift_args
 # $2 container
 # $3 1 for existing, 0 for not existing (default: 1)
+# $4 deciseconds to wait for the container to (dis)appear. default 30
 assert_container_exists () {
         local swift_args="$1"
         local container=$2
         local existing=${3:-1}
+        local timeout=${4:-30}
         [ -n "$swift_args" ] || die_error "assert_container_exists() needs a list of swift args as \$1"
         [ -n "$container" ] || die_error "assert_container_exists() needs a non-zero swift container name as \$2"
         check_is_in $existing 0 1 || die_error "assert_container_exists() needs the number 1 or 0 (or empty for default of 1) as \$3, not $3"
-        if swift $swift_args list "$container" 2>&1 | grep -q "Container '$container' not found"; then
+        [[ $timeout =~ ^[0-9]+$ ]] || die_error "assert_container_exists() \$4 must be a number! not $timeout"
+        desired_container_exists () {
+                if ! swift $swift_args list "$container" 2>&1 | grep -q "Container '$container' not found"; then
+                        ((existing)) && win "1 swift container '$container'" && return 0
+                else
+                        ! ((existing)) && win "no swift container '$container'" && return 0
+                fi
+                return 1
+        }
+        if ! wait_until desired_container_exists $timeout; then
                 if ((existing)); then
                         fail "no swift container '$container'"
-                else
-                        win "no swift container '$container'"
-                fi
-        else
-                if ((existing)); then
-                        win "1 swift container '$container'"
                 else
                         fail "1 swift container '$container'"
                 fi
