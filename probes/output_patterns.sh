@@ -19,9 +19,9 @@ assert_only_error () {
         num_errors_match=$(grep -iR "$error_match" "$@" 2>/dev/null | wc -l)
         if [ $num_errors_match -gt 0 ]; then
                 win "$num_errors_match error(s) matching '$error_match' in $(compact_filenames $@)"
-                num_errors_all=$(grep -iR error "$@" 2>/dev/null | grep -iv "$error_match" | wc -l)
-                if [ $num_errors_all -gt 0 ]; then
-                        fail "$num_errors_all total errors in $(compact_filenames $@)"
+                num_errors_other=$(grep -iR error "$@" 2>/dev/null | grep -iv "$error_match" | wc -l)
+                if [ $num_errors_other -gt 0 ]; then
+                        fail "$num_errors_other other errors in $(compact_filenames $@)"
                 fi
         else
                 fail "no error matching '$error_match' in $(compact_filenames $@)"
