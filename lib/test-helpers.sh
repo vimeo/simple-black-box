@@ -13,6 +13,7 @@ load_params_from_config () {
         ${config_backend}_get_var_string $config_sandbox swift_container; container=$return
         ${config_backend}_get_var_number $config_sandbox statsd_port; statsd_port=$return
         ${config_backend}_get_var_string $config_sandbox statsd_host; statsd_host=$return
+        ${config_backend}_get_var_number $config_sandbox port; port=$return
 }
 
 load_correct_params_from_config () {
@@ -43,7 +44,7 @@ load_correct_params_from_config () {
                         udp_statsd_pattern_statsdev="-i any dst $statsd_host"
                 fi
         fi
-        http_pattern_vega="-d lo host localhost and port 8080"
+        http_pattern_vega="-d lo host localhost and port $port"
 }
 
 upload_file_curl () {
