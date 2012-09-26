@@ -1,7 +1,15 @@
+# TODO: this does not work for privileged ports (<1024), because lsof doesn't list them unless you run it as root
+
+# $1 'lsof -i' compatible address specification, example: tcp:8080
+is_listening () {
+        local address=$1
+        [ -n "$address" ] || die_error "is_listening needs a non-zero 'lsof -i' compatible address specification as \$1"
+        lsof -i $address | grep -q LISTEN
+}
+
 # $1 'lsof -i' compatible address specification, example: tcp:8080
 # $2 1 for listening, 0 for not listening
 # $3 deciseconds to wait, in case it takes a while before your process starts/stops listening) (default: 50)
-# TODO: this does not work for privileged ports (<1024), because lsof doesn't list them unless you run it as root
 # netstat always lists privileged ports even when running as normal user, but that tool is less handy
 assert_listening () {
         address=$1
@@ -12,10 +20,10 @@ assert_listening () {
         [[ $timeout =~ ^[0-9]+$ ]] || die_error "kill_graceful() \$3 must be a number! not $timeout"
         debug "assert_listening on address $address (listening: $listening) -> lsof -i $address"
         desired_listening () {
-            if ((listening)) && lsof -i $address | grep -q LISTEN; then
+            if ((listening)) && is_listening $address; then
                     win "net: something is listening on $address (after $timer ds)"
                     return 0
-            elif ((!listening)) && ! lsof -i $address | grep -q LISTEN; then
+            elif ((!listening)) && ! is_listening $address; then
                     win "net: nothing is listening on $address (after $timer ds)"
                     return 0
             fi
